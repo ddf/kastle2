@@ -1,0 +1,292 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wiki", "wiki", "{AB0327BE-5BCC-4C53-9EF8-81C5D025E43D}"
+	ProjectSection(SolutionItems) = preProject
+		APP_LIST.md = APP_LIST.md
+		CODING_STYLE.md = CODING_STYLE.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		FAQ.md = FAQ.md
+		GLOSSARY_EXAMPLES.md = GLOSSARY_EXAMPLES.md
+		MIDI_MAPPINGS.md = MIDI_MAPPINGS.md
+		README.md = README.md
+		TOOLCHAIN_INSTALL.md = TOOLCHAIN_INSTALL.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7430E0E3-5CF6-4AAD-8BD9-D7FD4A6ED725}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\tusb_config.h = code\src\tusb_config.h
+		code\src\usb_descriptors.c = code\src\usb_descriptors.c
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{FCC6F35B-0B50-4C19-87D1-8B3A2486FCA5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{4C75429D-B7AD-402D-BEF9-D58F176C079E}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\config.hpp = code\src\common\config.hpp
+		code\src\common\debug.hpp = code\src\common\debug.hpp
+		code\src\common\EnumTools.hpp = code\src\common\EnumTools.hpp
+		code\src\common\fastcode.cpp = code\src\common\fastcode.cpp
+		code\src\common\fastcode.hpp = code\src\common\fastcode.hpp
+		code\src\common\utils.hpp = code\src\common\utils.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "controls", "controls", "{FA364D2E-3298-4F1D-A896-60248B1707F7}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\controls\DirtyInputsHandler.hpp = code\src\common\controls\DirtyInputsHandler.hpp
+		code\src\common\controls\FancyMode.cpp = code\src\common\controls\FancyMode.cpp
+		code\src\common\controls\FancyMode.hpp = code\src\common\controls\FancyMode.hpp
+		code\src\common\controls\FancyPot.cpp = code\src\common\controls\FancyPot.cpp
+		code\src\common\controls\FancyPot.hpp = code\src\common\controls\FancyPot.hpp
+		code\src\common\controls\ShiftTrigger.hpp = code\src\common\controls\ShiftTrigger.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{AFA5A2C4-8636-4DCD-A5DC-2B8CC553D9D3}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\core\App.hpp = code\src\common\core\App.hpp
+		code\src\common\core\Base.cpp = code\src\common\core\Base.cpp
+		code\src\common\core\Base.hpp = code\src\common\core\Base.hpp
+		code\src\common\core\Clock.cpp = code\src\common\core\Clock.cpp
+		code\src\common\core\Clock.hpp = code\src\common\core\Clock.hpp
+		code\src\common\core\Codec.hpp = code\src\common\core\Codec.hpp
+		code\src\common\core\FakeBlinker.hpp = code\src\common\core\FakeBlinker.hpp
+		code\src\common\core\Hardware.cpp = code\src\common\core\Hardware.cpp
+		code\src\common\core\Hardware.hpp = code\src\common\core\Hardware.hpp
+		code\src\common\core\Kastle2.cpp = code\src\common\core\Kastle2.cpp
+		code\src\common\core\Kastle2.hpp = code\src\common\core\Kastle2.hpp
+		code\src\common\core\Kastle2_cc.hpp = code\src\common\core\Kastle2_cc.hpp
+		code\src\common\core\Kastle2_parameters.hpp = code\src\common\core\Kastle2_parameters.hpp
+		code\src\common\core\Memory.cpp = code\src\common\core\Memory.cpp
+		code\src\common\core\Memory.hpp = code\src\common\core\Memory.hpp
+		code\src\common\core\MultiCore.hpp = code\src\common\core\MultiCore.hpp
+		code\src\common\core\UserDataFile.hpp = code\src\common\core\UserDataFile.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "debug", "debug", "{66BDBD78-A02E-4EB9-B604-C00C7D04F826}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\debug\SEGGER_RTT.c = code\src\common\debug\SEGGER_RTT.c
+		code\src\common\debug\SEGGER_RTT.h = code\src\common\debug\SEGGER_RTT.h
+		code\src\common\debug\SEGGER_RTT_Conf.h = code\src\common\debug\SEGGER_RTT_Conf.h
+		code\src\common\debug\UsbSerial.cpp = code\src\common\debug\UsbSerial.cpp
+		code\src\common\debug\UsbSerial.hpp = code\src\common\debug\UsbSerial.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dsp", "dsp", "{B421B5F7-6D82-46B9-8A3B-E74C16E4B6D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "peripherals", "peripherals", "{0C6E9B25-9135-4913-AAED-AD52EF572374}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\peripherals\AT24C.cpp = code\src\common\peripherals\AT24C.cpp
+		code\src\common\peripherals\AT24C.hpp = code\src\common\peripherals\AT24C.hpp
+		code\src\common\peripherals\NAU88C22.cpp = code\src\common\peripherals\NAU88C22.cpp
+		code\src\common\peripherals\NAU88C22.hpp = code\src\common\peripherals\NAU88C22.hpp
+		code\src\common\peripherals\WS2812.cpp = code\src\common\peripherals\WS2812.cpp
+		code\src\common\peripherals\WS2812.hpp = code\src\common\peripherals\WS2812.hpp
+		code\src\common\peripherals\WS2812.pio = code\src\common\peripherals\WS2812.pio
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testmode", "testmode", "{38CD7F87-45D3-4842-B966-1BE9C41ED3C1}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\testmode\TestEntry.cpp = code\src\common\testmode\TestEntry.cpp
+		code\src\common\testmode\TestEntry.hpp = code\src\common\testmode\TestEntry.hpp
+		code\src\common\testmode\TestMode.cpp = code\src\common\testmode\TestMode.cpp
+		code\src\common\testmode\TestMode.hpp = code\src\common\testmode\TestMode.hpp
+		code\src\common\testmode\version_samples.cpp = code\src\common\testmode\version_samples.cpp
+		code\src\common\testmode\version_samples.hpp = code\src\common\testmode\version_samples.hpp
+		code\src\common\testmode\VersionChainGenerator.hpp = code\src\common\testmode\VersionChainGenerator.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "clocks", "clocks", "{29C40988-0862-4C53-B6D4-90E97931FD7B}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\core\clocks\ClockSource.hpp = code\src\common\core\clocks\ClockSource.hpp
+		code\src\common\core\clocks\ExternalClockSource.cpp = code\src\common\core\clocks\ExternalClockSource.cpp
+		code\src\common\core\clocks\ExternalClockSource.hpp = code\src\common\core\clocks\ExternalClockSource.hpp
+		code\src\common\core\clocks\InternalClockSource.cpp = code\src\common\core\clocks\InternalClockSource.cpp
+		code\src\common\core\clocks\InternalClockSource.hpp = code\src\common\core\clocks\InternalClockSource.hpp
+		code\src\common\core\clocks\MidiClockSource.cpp = code\src\common\core\clocks\MidiClockSource.cpp
+		code\src\common\core\clocks\MidiClockSource.hpp = code\src\common\core\clocks\MidiClockSource.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "midi", "midi", "{A65047B3-6F64-4CF9-8FEE-0A4B52DE3154}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\core\midi\Handler.cpp = code\src\common\core\midi\Handler.cpp
+		code\src\common\core\midi\Handler.hpp = code\src\common\core\midi\Handler.hpp
+		code\src\common\core\midi\Message.cpp = code\src\common\core\midi\Message.cpp
+		code\src\common\core\midi\Message.hpp = code\src\common\core\midi\Message.hpp
+		code\src\common\core\midi\NoteSender.hpp = code\src\common\core\midi\NoteSender.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "control", "control", "{A6D87711-E6F1-4A32-88A9-3B79BD0AFCE1}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\dsp\control\AdsrEnv.cpp = code\src\common\dsp\control\AdsrEnv.cpp
+		code\src\common\dsp\control\AdsrEnv.hpp = code\src\common\dsp\control\AdsrEnv.hpp
+		code\src\common\dsp\control\BeatDetector.cpp = code\src\common\dsp\control\BeatDetector.cpp
+		code\src\common\dsp\control\BeatDetector.hpp = code\src\common\dsp\control\BeatDetector.hpp
+		code\src\common\dsp\control\EnvelopeFollower.cpp = code\src\common\dsp\control\EnvelopeFollower.cpp
+		code\src\common\dsp\control\EnvelopeFollower.hpp = code\src\common\dsp\control\EnvelopeFollower.hpp
+		code\src\common\dsp\control\Lfo.cpp = code\src\common\dsp\control\Lfo.cpp
+		code\src\common\dsp\control\Lfo.hpp = code\src\common\dsp\control\Lfo.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "effects", "effects", "{918F47B3-4BD8-4A51-8034-D76EFE6900BC}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\dsp\effects\BitCrusher.hpp = code\src\common\dsp\effects\BitCrusher.hpp
+		code\src\common\dsp\effects\CorrectingTrackAndHold.cpp = code\src\common\dsp\effects\CorrectingTrackAndHold.cpp
+		code\src\common\dsp\effects\CorrectingTrackAndHold.hpp = code\src\common\dsp\effects\CorrectingTrackAndHold.hpp
+		code\src\common\dsp\effects\HardClipper.cpp = code\src\common\dsp\effects\HardClipper.cpp
+		code\src\common\dsp\effects\HardClipper.hpp = code\src\common\dsp\effects\HardClipper.hpp
+		code\src\common\dsp\effects\lookup_tanh.hpp = code\src\common\dsp\effects\lookup_tanh.hpp
+		code\src\common\dsp\effects\SoftClipper.cpp = code\src\common\dsp\effects\SoftClipper.cpp
+		code\src\common\dsp\effects\SoftClipper.hpp = code\src\common\dsp\effects\SoftClipper.hpp
+		code\src\common\dsp\effects\StereoDelay.cpp = code\src\common\dsp\effects\StereoDelay.cpp
+		code\src\common\dsp\effects\StereoDelay.hpp = code\src\common\dsp\effects\StereoDelay.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "filters", "filters", "{F459B433-B375-43CC-A2FF-78E1C890A768}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\dsp\filters\DjFilter.cpp = code\src\common\dsp\filters\DjFilter.cpp
+		code\src\common\dsp\filters\DjFilter.hpp = code\src\common\dsp\filters\DjFilter.hpp
+		code\src\common\dsp\filters\DjFilterStereo.cpp = code\src\common\dsp\filters\DjFilterStereo.cpp
+		code\src\common\dsp\filters\DjFilterStereo.hpp = code\src\common\dsp\filters\DjFilterStereo.hpp
+		code\src\common\dsp\filters\Svf.cpp = code\src\common\dsp\filters\Svf.cpp
+		code\src\common\dsp\filters\Svf.hpp = code\src\common\dsp\filters\Svf.hpp
+		code\src\common\dsp\filters\SvfStereo.cpp = code\src\common\dsp\filters\SvfStereo.cpp
+		code\src\common\dsp\filters\SvfStereo.hpp = code\src\common\dsp\filters\SvfStereo.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "math", "math", "{2492EC54-7201-43A0-B1EA-4E6E8C90F022}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\dsp\math\bit_utils.hpp = code\src\common\dsp\math\bit_utils.hpp
+		code\src\common\dsp\math\Fft.cpp = code\src\common\dsp\math\Fft.cpp
+		code\src\common\dsp\math\Fft.hpp = code\src\common\dsp\math\Fft.hpp
+		code\src\common\dsp\math\Fraction.hpp = code\src\common\dsp\math\Fraction.hpp
+		code\src\common\dsp\math\lookup_qmath_sine.hpp = code\src\common\dsp\math\lookup_qmath_sine.hpp
+		code\src\common\dsp\math\math_utils.hpp = code\src\common\dsp\math\math_utils.hpp
+		code\src\common\dsp\math\qmath.hpp = code\src\common\dsp\math\qmath.hpp
+		code\src\common\dsp\math\RunningAverage.hpp = code\src\common\dsp\math\RunningAverage.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sampling", "sampling", "{066C0214-352F-4076-A7E2-958BCC8935B2}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\dsp\sampling\SamplePlayer.hpp = code\src\common\dsp\sampling\SamplePlayer.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "synthesis", "synthesis", "{3370CCAF-6D9A-4049-933C-A3AFB61680F1}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\dsp\synthesis\Fm2.cpp = code\src\common\dsp\synthesis\Fm2.cpp
+		code\src\common\dsp\synthesis\Fm2.hpp = code\src\common\dsp\synthesis\Fm2.hpp
+		code\src\common\dsp\synthesis\MultiOscillator.cpp = code\src\common\dsp\synthesis\MultiOscillator.cpp
+		code\src\common\dsp\synthesis\MultiOscillator.hpp = code\src\common\dsp\synthesis\MultiOscillator.hpp
+		code\src\common\dsp\synthesis\Oscillator.cpp = code\src\common\dsp\synthesis\Oscillator.cpp
+		code\src\common\dsp\synthesis\Oscillator.hpp = code\src\common\dsp\synthesis\Oscillator.hpp
+		code\src\common\dsp\synthesis\OscillatorQ15.cpp = code\src\common\dsp\synthesis\OscillatorQ15.cpp
+		code\src\common\dsp\synthesis\OscillatorQ15.hpp = code\src\common\dsp\synthesis\OscillatorQ15.hpp
+		code\src\common\dsp\synthesis\WhiteNoise.hpp = code\src\common\dsp\synthesis\WhiteNoise.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utility", "utility", "{0BADBA38-6963-4D28-9203-0B20F918DAFA}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\common\dsp\utility\AdvancedDynamicDelayLine.hpp = code\src\common\dsp\utility\AdvancedDynamicDelayLine.hpp
+		code\src\common\dsp\utility\AutoFreeze.hpp = code\src\common\dsp\utility\AutoFreeze.hpp
+		code\src\common\dsp\utility\EdgeDetector.hpp = code\src\common\dsp\utility\EdgeDetector.hpp
+		code\src\common\dsp\utility\KastleRungler.cpp = code\src\common\dsp\utility\KastleRungler.cpp
+		code\src\common\dsp\utility\KastleRungler.hpp = code\src\common\dsp\utility\KastleRungler.hpp
+		code\src\common\dsp\utility\lookup_SlewGenerator.hpp = code\src\common\dsp\utility\lookup_SlewGenerator.hpp
+		code\src\common\dsp\utility\NumberFlasher.hpp = code\src\common\dsp\utility\NumberFlasher.hpp
+		code\src\common\dsp\utility\Portamento.cpp = code\src\common\dsp\utility\Portamento.cpp
+		code\src\common\dsp\utility\Portamento.hpp = code\src\common\dsp\utility\Portamento.hpp
+		code\src\common\dsp\utility\Quantizer.cpp = code\src\common\dsp\utility\Quantizer.cpp
+		code\src\common\dsp\utility\Quantizer.hpp = code\src\common\dsp\utility\Quantizer.hpp
+		code\src\common\dsp\utility\RingBuffer.hpp = code\src\common\dsp\utility\RingBuffer.hpp
+		code\src\common\dsp\utility\Sequencer.cpp = code\src\common\dsp\utility\Sequencer.cpp
+		code\src\common\dsp\utility\Sequencer.hpp = code\src\common\dsp\utility\Sequencer.hpp
+		code\src\common\dsp\utility\SignalCorrelator.cpp = code\src\common\dsp\utility\SignalCorrelator.cpp
+		code\src\common\dsp\utility\SignalCorrelator.hpp = code\src\common\dsp\utility\SignalCorrelator.hpp
+		code\src\common\dsp\utility\Slewer.hpp = code\src\common\dsp\utility\Slewer.hpp
+		code\src\common\dsp\utility\SlewGenerator.hpp = code\src\common\dsp\utility\SlewGenerator.hpp
+		code\src\common\dsp\utility\TriggerGenerator.hpp = code\src\common\dsp\utility\TriggerGenerator.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Calibration", "Calibration", "{66837177-18CA-4E6B-9828-64DE4574CE81}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\apps\Calibration\AppCalibration.cpp = code\src\apps\Calibration\AppCalibration.cpp
+		code\src\apps\Calibration\AppCalibration.hpp = code\src\apps\Calibration\AppCalibration.hpp
+		code\src\apps\Calibration\CMakeLists.txt = code\src\apps\Calibration\CMakeLists.txt
+		code\src\apps\Calibration\main.cpp = code\src\apps\Calibration\main.cpp
+		code\src\apps\Calibration\samples_calibration.hpp = code\src\apps\Calibration\samples_calibration.hpp
+		code\src\apps\Calibration\Sentence.hpp = code\src\apps\Calibration\Sentence.hpp
+		code\src\apps\Calibration\version_samples_app.hpp = code\src\apps\Calibration\version_samples_app.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FxWizard", "FxWizard", "{3E54B556-8E1F-4E45-852B-4F55E8B94F03}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\apps\FxWizard\AppFxWizard.cpp = code\src\apps\FxWizard\AppFxWizard.cpp
+		code\src\apps\FxWizard\AppFxWizard.hpp = code\src\apps\FxWizard\AppFxWizard.hpp
+		code\src\apps\FxWizard\cc.hpp = code\src\apps\FxWizard\cc.hpp
+		code\src\apps\FxWizard\CMakeLists.txt = code\src\apps\FxWizard\CMakeLists.txt
+		code\src\apps\FxWizard\FX_WIZARD_FILE_FORMAT.md = code\src\apps\FxWizard\FX_WIZARD_FILE_FORMAT.md
+		code\src\apps\FxWizard\FxWizardFile.hpp = code\src\apps\FxWizard\FxWizardFile.hpp
+		code\src\apps\FxWizard\FxWizardParameterMaps.hpp = code\src\apps\FxWizard\FxWizardParameterMaps.hpp
+		code\src\apps\FxWizard\main.cpp = code\src\apps\FxWizard\main.cpp
+		code\src\apps\FxWizard\README.md = code\src\apps\FxWizard\README.md
+		code\src\apps\FxWizard\version_samples_app.hpp = code\src\apps\FxWizard\version_samples_app.hpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Template", "Template", "{2601A0FF-CFA5-45CA-A2D8-9F12A0FFB273}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\apps\Template\AppTemplate.cpp = code\src\apps\Template\AppTemplate.cpp
+		code\src\apps\Template\AppTemplate.hpp = code\src\apps\Template\AppTemplate.hpp
+		code\src\apps\Template\CMakeLists.txt = code\src\apps\Template\CMakeLists.txt
+		code\src\apps\Template\main.cpp = code\src\apps\Template\main.cpp
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WaveBard", "WaveBard", "{3CFD6245-7448-4754-B11D-05E8A26AE9F3}"
+	ProjectSection(SolutionItems) = preProject
+		code\src\apps\WaveBard\AppWaveBard.cpp = code\src\apps\WaveBard\AppWaveBard.cpp
+		code\src\apps\WaveBard\AppWaveBard.hpp = code\src\apps\WaveBard\AppWaveBard.hpp
+		code\src\apps\WaveBard\cc.hpp = code\src\apps\WaveBard\cc.hpp
+		code\src\apps\WaveBard\CMakeLists.txt = code\src\apps\WaveBard\CMakeLists.txt
+		code\src\apps\WaveBard\main.cpp = code\src\apps\WaveBard\main.cpp
+		code\src\apps\WaveBard\README.md = code\src\apps\WaveBard\README.md
+		code\src\apps\WaveBard\SAMPLES.bin = code\src\apps\WaveBard\SAMPLES.bin
+		code\src\apps\WaveBard\version_samples_app.hpp = code\src\apps\WaveBard\version_samples_app.hpp
+		code\src\apps\WaveBard\WAVE_BARD_FORMAT.md = code\src\apps\WaveBard\WAVE_BARD_FORMAT.md
+		code\src\apps\WaveBard\WaveBardFile.hpp = code\src\apps\WaveBard\WaveBardFile.hpp
+		code\src\apps\WaveBard\WaveBardParameterMaps.hpp = code\src\apps\WaveBard\WaveBardParameterMaps.hpp
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleSynth", "projects\ExampleSynth.vcxproj", "{5AE44C2A-D6D2-46E7-90B3-59ACC67BF759}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FCC6F35B-0B50-4C19-87D1-8B3A2486FCA5} = {7430E0E3-5CF6-4AAD-8BD9-D7FD4A6ED725}
+		{4C75429D-B7AD-402D-BEF9-D58F176C079E} = {7430E0E3-5CF6-4AAD-8BD9-D7FD4A6ED725}
+		{FA364D2E-3298-4F1D-A896-60248B1707F7} = {4C75429D-B7AD-402D-BEF9-D58F176C079E}
+		{AFA5A2C4-8636-4DCD-A5DC-2B8CC553D9D3} = {4C75429D-B7AD-402D-BEF9-D58F176C079E}
+		{66BDBD78-A02E-4EB9-B604-C00C7D04F826} = {4C75429D-B7AD-402D-BEF9-D58F176C079E}
+		{B421B5F7-6D82-46B9-8A3B-E74C16E4B6D2} = {4C75429D-B7AD-402D-BEF9-D58F176C079E}
+		{0C6E9B25-9135-4913-AAED-AD52EF572374} = {4C75429D-B7AD-402D-BEF9-D58F176C079E}
+		{38CD7F87-45D3-4842-B966-1BE9C41ED3C1} = {4C75429D-B7AD-402D-BEF9-D58F176C079E}
+		{29C40988-0862-4C53-B6D4-90E97931FD7B} = {AFA5A2C4-8636-4DCD-A5DC-2B8CC553D9D3}
+		{A65047B3-6F64-4CF9-8FEE-0A4B52DE3154} = {AFA5A2C4-8636-4DCD-A5DC-2B8CC553D9D3}
+		{A6D87711-E6F1-4A32-88A9-3B79BD0AFCE1} = {B421B5F7-6D82-46B9-8A3B-E74C16E4B6D2}
+		{918F47B3-4BD8-4A51-8034-D76EFE6900BC} = {B421B5F7-6D82-46B9-8A3B-E74C16E4B6D2}
+		{F459B433-B375-43CC-A2FF-78E1C890A768} = {B421B5F7-6D82-46B9-8A3B-E74C16E4B6D2}
+		{2492EC54-7201-43A0-B1EA-4E6E8C90F022} = {B421B5F7-6D82-46B9-8A3B-E74C16E4B6D2}
+		{066C0214-352F-4076-A7E2-958BCC8935B2} = {B421B5F7-6D82-46B9-8A3B-E74C16E4B6D2}
+		{3370CCAF-6D9A-4049-933C-A3AFB61680F1} = {B421B5F7-6D82-46B9-8A3B-E74C16E4B6D2}
+		{0BADBA38-6963-4D28-9203-0B20F918DAFA} = {B421B5F7-6D82-46B9-8A3B-E74C16E4B6D2}
+		{66837177-18CA-4E6B-9828-64DE4574CE81} = {FCC6F35B-0B50-4C19-87D1-8B3A2486FCA5}
+		{3E54B556-8E1F-4E45-852B-4F55E8B94F03} = {FCC6F35B-0B50-4C19-87D1-8B3A2486FCA5}
+		{2601A0FF-CFA5-45CA-A2D8-9F12A0FFB273} = {FCC6F35B-0B50-4C19-87D1-8B3A2486FCA5}
+		{3CFD6245-7448-4754-B11D-05E8A26AE9F3} = {FCC6F35B-0B50-4C19-87D1-8B3A2486FCA5}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5AE44C2A-D6D2-46E7-90B3-59ACC67BF759}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{5AE44C2A-D6D2-46E7-90B3-59ACC67BF759}.Debug|Any CPU.Build.0 = Debug|Win32
+		{5AE44C2A-D6D2-46E7-90B3-59ACC67BF759}.Release|Any CPU.ActiveCfg = Release|Win32
+		{5AE44C2A-D6D2-46E7-90B3-59ACC67BF759}.Release|Any CPU.Build.0 = Release|Win32
+	EndGlobalSection
+EndGlobal
