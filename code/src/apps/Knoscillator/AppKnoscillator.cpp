@@ -43,8 +43,8 @@ void AppKnoscillator::Init()
 
 void AppKnoscillator::DeInit()
 {
-    Knoscil::destroy(knoscil_);
     inited_ = false;
+    Knoscil::destroy(knoscil_);
 }
 
 FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t size)
@@ -60,6 +60,9 @@ FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t siz
         q15_t right = input[2 * i + 1];
 
         // code that runs each sample
+        Knoscil::SampleType out = knoscil_->generate();
+        left = float_to_q15(out.left());
+        right = float_to_q15(out.right());
 
         // output
         output[2 * i] = left;

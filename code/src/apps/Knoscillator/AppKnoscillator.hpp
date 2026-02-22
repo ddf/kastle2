@@ -36,13 +36,6 @@ SOFTWARE.
 namespace kastle2
 {
 
-/**
- * @class AppTemplate
- * @ingroup apps
- * @brief Simple template for creating new apps.
- * @author Marek Mach (Bastl Instruments)
- * @date 2024-11-14
- */
 class AppKnoscillator : public virtual App
 {
     using Knoscil = Knoscillator<float>;
