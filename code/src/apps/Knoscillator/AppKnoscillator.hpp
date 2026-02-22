@@ -61,12 +61,12 @@ public:
     /**
      * @brief Initializes all the parameters, memory, etc.
      */
-    void Init();
+    void Init() override;
 
     /**
      * @brief Deinitializes the app, stops all effects, etc.
      */
-    void DeInit();
+    void DeInit() override;
 
     /**
      * @brief Called each interrupt loop. Implements all the audio processing.
@@ -74,36 +74,36 @@ public:
      * @param output Output buffer.
      * @param size Number of sample pairs in the buffer (real size of the buffer is 2*size).
      */
-    FASTCODE void AudioLoop(q15_t *input, q15_t *output, size_t size);
+    FASTCODE void AudioLoop(q15_t *input, q15_t *output, size_t size) override;
 
     /**
      * @brief Called each time AudioLoop isn't busy.
      */
-    void UiLoop();
+    void UiLoop() override;
 
     /**
      * @brief Called when the app is first loaded - initializes the memory values.
      */
-    void MemoryInitialization() {}
+    void MemoryInitialization() override {}
 
     /**
      * @brief Handles incoming MIDI messages.
      * @param msg The MIDI message to handle.
      */
-    void MidiCallback(midi::Message *msg);
+    void MidiCallback(midi::Message *msg) override;
 
     /**
      * @brief Returns the app ID.
      * @return The app ID.
      */
-    uint8_t GetId()
+    uint8_t GetId() override
     {
         return Kastle2::kDefaultAppId;
     }
 
 private:
     bool inited_ = false;
-    Mode mode_;
-    Knoscil* knoscil;
+    Mode mode_ = Mode::FIRST;
+    Knoscil* knoscil_ = nullptr;
 };
 }

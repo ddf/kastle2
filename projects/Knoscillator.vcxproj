@@ -7,22 +7,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\code\src\apps\ExampleSynth\AppExampleSynth.cpp" />
-    <ClCompile Include="..\code\src\apps\ExampleSynth\main.cpp" />
+    <ClCompile Include="..\code\src\apps\Knoscillator\AppKnoscillator.cpp" />
+    <ClCompile Include="..\code\src\apps\Knoscillator\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\code\src\apps\ExampleSynth\AppExampleSynth.hpp" />
-    <ClInclude Include="..\code\src\apps\ExampleSynth\ExampleSynthParameterMaps.hpp" />
-    <ClInclude Include="..\code\src\apps\ExampleSynth\version_samples_app.hpp" />
+    <ClInclude Include="..\code\src\apps\Knoscillator\AppKnoscillator.hpp" />
+    <ClInclude Include="..\code\src\vessicle\Knoscillator.h" />
+    <ClInclude Include="..\code\src\vessicle\KnotOscillator.h" />
+    <ClInclude Include="..\code\src\vessicle\Noise.hpp" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl.h" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\code\src\apps\ExampleSynth\CMakeLists.txt" />
+    <Content Include="..\code\src\apps\Knoscillator\CMakeLists.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{5AE44C2A-D6D2-46E7-90B3-59ACC67BF759}</ProjectGuid>
+    <ProjectGuid>{A739DDB1-6F09-4438-A66C-BE0124DD3B92}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>ExampleSynth</RootNamespace>
+    <RootNamespace>Knoscillator</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -30,7 +32,7 @@
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Makefile</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -46,8 +48,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <ExecutablePath>$(VC_ExecutablePath_x86);$(CommonExecutablePath);</ExecutablePath>
-    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);../code/src/;</IncludePath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);..code/src;</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -58,8 +59,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp23</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <AdditionalIncludeDirectories>../code/src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -33,7 +33,7 @@ void AppKnoscillator::Init()
 {
     inited_ = false;
     mode_ = Mode::FIRST;
-    knoscil = Knoscil::create(SAMPLE_RATE);
+    knoscil_ = Knoscil::create(SAMPLE_RATE);
 
     // disable audio chain, we are doing it ourselves
     Kastle2::base.SetFeatureEnabled(Base::Feature::AUDIO_CHAIN, false);
@@ -43,7 +43,7 @@ void AppKnoscillator::Init()
 
 void AppKnoscillator::DeInit()
 {
-    Knoscil::destroy(knoscil);
+    Knoscil::destroy(knoscil_);
     inited_ = false;
 }
 
@@ -98,4 +98,5 @@ void AppKnoscillator::UiLoop()
 void AppKnoscillator::MidiCallback(midi::Message *msg)
 {
     // Do something here...
+    (void)msg;
 }
