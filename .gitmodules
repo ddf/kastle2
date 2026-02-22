@@ -1,0 +1,3 @@
+[submodule "code/src/vessicle"]
+	path = code/src/vessicle
+	url = https://github.com/ddf/vessicle.git
