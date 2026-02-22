@@ -3,5 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/code/build/_deps/picotool-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/code/src/vessicle" vcs="Git" />
+      <mapping directory="$PROJECT_DIR$/code/src/vessicle/vessl" vcs="Git" />
   </component>
 </project>
