@@ -30,7 +30,7 @@ SOFTWARE.
 #include "common/core/App.hpp"
 #include "common/core/Hardware.hpp"
 #include "common/core/Kastle2.hpp"
-#include "common/dsp/math/qmath.hpp"
+#include "vessl_qmath.hpp"
 #include "vessicle/Knoscillator.h"
 
 namespace kastle2
@@ -38,7 +38,7 @@ namespace kastle2
 
 class AppKnoscillator : public virtual App
 {
-    using Knoscil = Knoscillator<float>;
+    using Knoscil = Knoscillator<vessl::q31_t>;
 public:
     /**
      * @brief Some example modes.

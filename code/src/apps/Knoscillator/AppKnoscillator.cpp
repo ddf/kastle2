@@ -34,6 +34,7 @@ void AppKnoscillator::Init()
     inited_ = false;
     mode_ = Mode::FIRST;
     knoscil_ = Knoscil::create(SAMPLE_RATE);
+    knoscil_->frequency() = 220.f;
 
     // disable audio chain, we are doing it ourselves
     Kastle2::base.SetFeatureEnabled(Base::Feature::AUDIO_CHAIN, false);
@@ -61,8 +62,8 @@ FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t siz
 
         // code that runs each sample
         Knoscil::SampleType out = knoscil_->generate();
-        left = float_to_q15(out.left());
-        right = float_to_q15(out.right());
+        left = q31_to_q15(out.left());
+        right = q31_to_q15(out.right());
 
         // output
         output[2 * i] = left;
