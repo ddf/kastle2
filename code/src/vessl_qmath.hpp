@@ -19,23 +19,7 @@ namespace vessl
 
         constexpr q31_t& operator=(const q31_t& x) { v_ = x.v_; return *this; }
         constexpr q31_t& operator=(const phase_t& x) { v_ = x/2; return *this; }
-        constexpr q31_t& operator=(const analog_t& x) 
-        {
-            analog_t y = x > 1.0f ? 1.0f : (x < -1.0f ? -1.0f : x); 
-            if (y == 1.0f)
-            {
-                v_ = kastle2::Q31_MAX;
-            }
-            else if (y == -1.f)
-            {
-                v_ = kastle2::Q31_MIN;
-            }
-            else
-            {
-                v_ = static_cast<kastle2::q31_t>(y * 2147483648.0);
-            }
-            return *this;
-        }
+        constexpr q31_t& operator=(const analog_t& x) { v_ = kastle2::float_to_q31(x); return *this; }
 
         constexpr operator kastle2::q31_t() const { return v_; }
         // clamps value to [0,1], expands to phase_t range.
@@ -54,6 +38,7 @@ namespace vessl
         q31_t& operator+=(const q31_t& rhs) { v_ = kastle2::q31_add(v_, rhs.v_); return *this; }
         friend q31_t operator+(q31_t lhs, const q31_t& rhs) { lhs += rhs; return lhs; }
 
+        q31_t& operator-() { v_ = kastle2::q31_inv(v_); return *this; }
         q31_t& operator-=(const q31_t& rhs) { v_ = kastle2::q31_sub(v_, rhs.v_); return *this; }
         friend q31_t operator-(q31_t lhs, const q31_t& rhs) { lhs -= rhs; return lhs; }
 
