@@ -135,7 +135,8 @@
             },
             "args": [
                 "${input:target}"
-            ]
+            ],
+            "problemMatcher": []
         },
         {
             "label": "build_and_upload_usb",
@@ -171,7 +172,7 @@
             "presentation": {
                 "showReuseMessage": false,
                 "group": "pico"
-            },
+            }
         },
         {
             "label": "make_docs_and_open",
@@ -182,7 +183,7 @@
             ],
             "dependsOrder": "sequence",
             "dependsOn": [
-                "make_docs",
+                "make_docs"
             ]
         }
     ]
