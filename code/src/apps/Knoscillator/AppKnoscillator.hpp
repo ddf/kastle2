@@ -33,12 +33,23 @@ SOFTWARE.
 #include "vessl_qmath.hpp"
 #include "vessicle/Knoscillator.h"
 
+using Knoscil = Knoscillator<vessl::q31_t>;
+
+struct KnotDebug 
+{
+    vessl::phase_t pp, pq, pz;
+    kastle2::q31_t x, y, z, proj;
+    vessl::analog_t cz;
+    kastle2::q31_t left, right;
+};
+
+extern KnotDebug gDbg;
+
 namespace kastle2
 {
 
 class AppKnoscillator : public virtual App
 {
-    using Knoscil = Knoscillator<vessl::q31_t>;
 public:
     /**
      * @brief Some example modes.

@@ -29,6 +29,8 @@ SOFTWARE.
 
 using namespace kastle2;
 
+KnotDebug gDbg;
+
 void AppKnoscillator::Init()
 {
     inited_ = false;
@@ -38,6 +40,8 @@ void AppKnoscillator::Init()
 
     // disable audio chain, we are doing it ourselves
     Kastle2::base.SetFeatureEnabled(Base::Feature::AUDIO_CHAIN, false);
+
+    //Kastle2::debug.SetEnabled(true);
 
     inited_ = true;
 }
@@ -54,6 +58,8 @@ FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t siz
     {
         return;
     }
+    //char msg[64];
+    Knoscil::SampleType out;
     for (size_t i = 0; i < size; i++)
     {
         // read
@@ -61,14 +67,29 @@ FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t siz
         q15_t right = input[2 * i + 1];
 
         // code that runs each sample
-        Knoscil::SampleType out = knoscil_->generate();
+        out = knoscil_->generate();
         left = q31_to_q15(out.left());
         right = q31_to_q15(out.right());
+        //printf(msg, "%i %i", out.left(), out.right());
+        //Kastle2::debug.PrintLine(msg, strlen(msg));
 
         // output
         output[2 * i] = left;
         output[2 * i + 1] = right;
     }
+
+    gDbg.pp = knoscil_->knot().pp();
+    gDbg.pq = knoscil_->knot().pq();
+    gDbg.pz = knoscil_->knot().pz();
+    gDbg.left = out.left().v_;
+    gDbg.right = out.right().v_;
+
+    auto coord = knoscil_->knot().xyz();
+    gDbg.x = coord.x.v_;
+    gDbg.y = coord.y.v_;
+    gDbg.z = coord.z.v_;
+    gDbg.cz = vessl::cast<vessl::analog_t>(coord.z);
+    gDbg.proj = knoscil_->getProjection().v_;
 }
 
 void AppKnoscillator::UiLoop()
