@@ -21,7 +21,8 @@
                 "wave-bard",
                 "wave-bard-with-samples",
                 "example-synth",
-                "template"
+                "template",
+                "knoscillator"
             ],
             "default": "wave-bard"
         }
