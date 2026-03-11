@@ -36,7 +36,10 @@ using namespace kastle2;
  * @author Vaclav Mach (Bastl Instruments)
  * @date 2023-11-28
  */
-#define APP_VERSION "1.0"
+
+// You can define this using a version number, eg. "1.6" or other words specified in version_samples.hpp
+#define APP_VERSION "draft"
+
 AppExampleSynth app;
 
 static void process_audio(q15_t *input, q15_t *output, size_t size)

@@ -52,8 +52,7 @@ private:
     static consteval const SamplePlayer16bit::Sample GetSample(std::string_view str)
     {
         // Return pointers to the global samples
-        if (str == "rc")
-            return version::rc;
+        // The longest strings should be matched first
         if (str == "release_candidate")
             return version::release_candidate;
         if (str == "beta_version")
@@ -62,12 +61,18 @@ private:
             return version::test_mode;
         if (str == "test_success")
             return version::test_success;
+        if (str == "latest")
+            return version::latest;
         if (str == "citadel")
             return version::citadel;
         if (str == "kastle2")
             return version::kastle2;
         if (str == "version")
-            return version::version;
+            return version::version;    
+        if (str == "draft")
+            return version::draft;
+        if (str == "rc")
+            return version::rc;
         if (str == "0")
             return version::zero;
         if (str == "1")

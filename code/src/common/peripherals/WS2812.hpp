@@ -72,26 +72,29 @@ public:
     };
 
     /**
-     * @brief Constructor for the WS2812 class.
+     * @brief Initilizes the WS2812 hardware.
+     * @warning Needs to be called after setting the MCU frequency!
      * @param pin GPIO pin number.
      * @param length Number of LEDs in the chain.
      * @param pio PIO instance.
      * @param sm PIO state machine number.
      */
-    WS2812(size_t pin, size_t length, PIO pio, size_t sm);
+    void Init(size_t pin, size_t length, PIO pio, size_t sm);
 
     /**
-     * @brief Constructor for the WS2812 class.
+     * @brief Initilizes the WS2812 hardware.
+     * @warning Needs to be called after setting the MCU frequency!
      * @param pin GPIO pin number.
      * @param length Number of LEDs in the chain.
      * @param pio PIO instance.
      * @param sm PIO state machine number.
      * @param format Color data format.
      */
-    WS2812(size_t pin, size_t length, PIO pio, size_t sm, DataFormat format);
+    void Init(size_t pin, size_t length, PIO pio, size_t sm, DataFormat format);
 
     /**
-     * @brief Constructor for the WS2812 class.
+     * @brief Initilizes the WS2812 hardware.
+     * @warning Needs to be called after setting the MCU frequency!
      * @param pin GPIO pin number.
      * @param length Number of LEDs in the chain.
      * @param pio PIO instance.
@@ -100,7 +103,7 @@ public:
      * @param b2 Color which should be data byte 2.
      * @param b3 Color which should be data byte 3.
      */
-    WS2812(size_t pin, size_t length, PIO pio, size_t sm, DataByte b1, DataByte b2, DataByte b3);
+    void Init(size_t pin, size_t length, PIO pio, size_t sm, DataByte b1, DataByte b2, DataByte b3);
 
     /**
      * @brief Packs the RGB color data into a single 32-bit integer.
@@ -264,7 +267,6 @@ private:
     DataByte bytes_[4];
     std::unique_ptr<uint32_t[]> data_;
 
-    void Initialize(size_t pin, size_t length, PIO pio, size_t sm, DataByte b1, DataByte b2, DataByte b3);
     uint32_t ConvertData(uint32_t rgb);
 
     static uint8_t GetColorByte(uint32_t color, uint32_t index);

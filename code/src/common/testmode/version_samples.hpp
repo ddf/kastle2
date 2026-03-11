@@ -13,6 +13,9 @@
 
 /*
  * Samples made using TTS Maker (voice 178 - Chloe) and sped up by 1.05x
+ * Sample rate 11050 Hz, 16-bit signed integer, mono
+ * You can use this to generate the proper data array: http://test.vaclav-mach.cz/audio2c/
+ * When you add a word, you'll need to add it to the VersionChainGenerator.hpp
  */
 
 #pragma once
@@ -48,6 +51,8 @@ static constexpr size_t citadel_length = 9873;
 static constexpr size_t release_candidate_length = 13188;
 static constexpr size_t rc_length = 8467;
 static constexpr size_t calibrated_length = 7308;
+static constexpr size_t latest_length = 7766;
+static constexpr size_t draft_length = 7503;
 
 extern const int16_t one_data[];
 extern const int16_t eight_data[];
@@ -70,29 +75,33 @@ extern const int16_t citadel_data[];
 extern const int16_t release_candidate_data[];
 extern const int16_t rc_data[];
 extern const int16_t calibrated_data[];
+extern const int16_t latest_data[];
+extern const int16_t draft_data[];
 
- constexpr SamplePlayer16bit::Sample one = {.data = one_data, .length = one_length};
- constexpr SamplePlayer16bit::Sample eight = {.data = eight_data, .length = eight_length};
- constexpr SamplePlayer16bit::Sample five = {.data = five_data, .length = five_length};
- constexpr SamplePlayer16bit::Sample beta_version = {.data = beta_version_data, .length = beta_version_length};
- constexpr SamplePlayer16bit::Sample four = {.data = four_data, .length = four_length};
- constexpr SamplePlayer16bit::Sample nine = {.data = nine_data, .length = nine_length};
- constexpr SamplePlayer16bit::Sample version = {.data = version_data, .length = version_length};
- constexpr SamplePlayer16bit::Sample three = {.data = three_data, .length = three_length};
- constexpr SamplePlayer16bit::Sample point = {.data = point_data, .length = point_length};
- constexpr SamplePlayer16bit::Sample seven = {.data = seven_data, .length = seven_length};
- constexpr SamplePlayer16bit::Sample kastle2 = {.data = kastle2_data, .length = kastle2_length};
- constexpr SamplePlayer16bit::Sample two = {.data = two_data, .length = two_length};
- constexpr SamplePlayer16bit::Sample six = {.data = six_data, .length = six_length};
- constexpr SamplePlayer16bit::Sample zero = {.data = zero_data, .length = zero_length};
- constexpr SamplePlayer16bit::Sample ten = {.data = ten_data, .length = ten_length};
- constexpr SamplePlayer16bit::Sample test_mode = {.data = test_mode_data, .length = test_mode_length};
- constexpr SamplePlayer16bit::Sample test_success = {.data = test_success_data, .length = test_success_length};
- constexpr SamplePlayer16bit::Sample citadel = {.data = citadel_data, .length = citadel_length};
- constexpr SamplePlayer16bit::Sample release_candidate = {.data = release_candidate_data, .length = release_candidate_length};
- constexpr SamplePlayer16bit::Sample rc = {.data = rc_data, .length = rc_length};
- constexpr SamplePlayer16bit::Sample calibrated = {.data = calibrated_data, .length = calibrated_length};
- constexpr SamplePlayer16bit::Sample empty = {.data = {}, .length = 0};
+constexpr SamplePlayer16bit::Sample one = {.data = one_data, .length = one_length};
+constexpr SamplePlayer16bit::Sample eight = {.data = eight_data, .length = eight_length};
+constexpr SamplePlayer16bit::Sample five = {.data = five_data, .length = five_length};
+constexpr SamplePlayer16bit::Sample beta_version = {.data = beta_version_data, .length = beta_version_length};
+constexpr SamplePlayer16bit::Sample four = {.data = four_data, .length = four_length};
+constexpr SamplePlayer16bit::Sample nine = {.data = nine_data, .length = nine_length};
+constexpr SamplePlayer16bit::Sample version = {.data = version_data, .length = version_length};
+constexpr SamplePlayer16bit::Sample three = {.data = three_data, .length = three_length};
+constexpr SamplePlayer16bit::Sample point = {.data = point_data, .length = point_length};
+constexpr SamplePlayer16bit::Sample seven = {.data = seven_data, .length = seven_length};
+constexpr SamplePlayer16bit::Sample kastle2 = {.data = kastle2_data, .length = kastle2_length};
+constexpr SamplePlayer16bit::Sample two = {.data = two_data, .length = two_length};
+constexpr SamplePlayer16bit::Sample six = {.data = six_data, .length = six_length};
+constexpr SamplePlayer16bit::Sample zero = {.data = zero_data, .length = zero_length};
+constexpr SamplePlayer16bit::Sample ten = {.data = ten_data, .length = ten_length};
+constexpr SamplePlayer16bit::Sample test_mode = {.data = test_mode_data, .length = test_mode_length};
+constexpr SamplePlayer16bit::Sample test_success = {.data = test_success_data, .length = test_success_length};
+constexpr SamplePlayer16bit::Sample citadel = {.data = citadel_data, .length = citadel_length};
+constexpr SamplePlayer16bit::Sample release_candidate = {.data = release_candidate_data, .length = release_candidate_length};
+constexpr SamplePlayer16bit::Sample rc = {.data = rc_data, .length = rc_length};
+constexpr SamplePlayer16bit::Sample calibrated = {.data = calibrated_data, .length = calibrated_length};
+constexpr SamplePlayer16bit::Sample latest = {.data = latest_data, .length = latest_length}; 
+constexpr SamplePlayer16bit::Sample draft = {.data = draft_data, .length = draft_length}; 
+constexpr SamplePlayer16bit::Sample empty = {.data = {}, .length = 0};
 
 }
 

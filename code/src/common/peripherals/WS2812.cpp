@@ -36,30 +36,25 @@ SOFTWARE.
 
 using namespace kastle2;
 
-WS2812::WS2812(size_t pin, size_t length, PIO pio, size_t sm)
+void WS2812::Init(size_t pin, size_t length, PIO pio, size_t sm)
 {
-    Initialize(pin, length, pio, sm, DataByte::GREEN, DataByte::RED, DataByte::BLUE);
+    Init(pin, length, pio, sm, DataByte::GREEN, DataByte::RED, DataByte::BLUE);
 }
 
-WS2812::WS2812(size_t pin, size_t length, PIO pio, size_t sm, DataFormat format)
+void WS2812::Init(size_t pin, size_t length, PIO pio, size_t sm, DataFormat format)
 {
     switch (format)
     {
     case DataFormat::RGB:
-        Initialize(pin, length, pio, sm, DataByte::RED, DataByte::GREEN, DataByte::BLUE);
+        Init(pin, length, pio, sm, DataByte::RED, DataByte::GREEN, DataByte::BLUE);
         break;
     case DataFormat::GRB:
-        Initialize(pin, length, pio, sm, DataByte::GREEN, DataByte::RED, DataByte::BLUE);
+        Init(pin, length, pio, sm, DataByte::GREEN, DataByte::RED, DataByte::BLUE);
         break;
     }
 }
 
-WS2812::WS2812(size_t pin, size_t length, PIO pio, size_t sm, DataByte b1, DataByte b2, DataByte b3)
-{
-    Initialize(pin, length, pio, sm, b1, b2, b3);
-}
-
-void WS2812::Initialize(size_t pin, size_t length, PIO pio, size_t sm, DataByte b1, DataByte b2, DataByte b3)
+void WS2812::Init(size_t pin, size_t length, PIO pio, size_t sm, DataByte b1, DataByte b2, DataByte b3)
 {
     pin_ = pin;
     length_ = length;

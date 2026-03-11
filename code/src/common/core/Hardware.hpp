@@ -638,6 +638,9 @@ private:
     // I2S driver
     I2S i2s_;
 
+    // LEDs
+    WS2812 pixels_;
+
     // ADC stuff
     bool srand_active_ = false;
     HwAnalogInput current_hw_adc_ = Hardware::HwAnalogInput::ADC0_COMMON;

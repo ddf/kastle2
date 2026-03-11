@@ -42,8 +42,6 @@ SOFTWARE.
 
 using namespace kastle2;
 
-WS2812 pixels = WS2812(Hardware::PIN_LEDS, 3, pio0, 3);
-
 EnumArray<Hardware::Button, size_t> ButtonsPins = {
     Hardware::PIN_BUTTON_SHIFT,
     Hardware::PIN_BUTTON_MODE};
@@ -126,13 +124,13 @@ void Hardware::Init()
     gpio_init(PIN_RX);
     gpio_set_dir(PIN_RX, GPIO_OUT);
 #endif
-
     // Init NeoPixels
+    pixels_.Init(Hardware::PIN_LEDS, 3, pio0, 3);
     for (Led led : EnumRange<Led>())
     {
-        pixels.SetPixelColor(static_cast<size_t>(led), 0x000000);
+        pixels_.SetPixelColor(static_cast<size_t>(led), 0x000000);
     }
-    pixels.Show();
+    pixels_.Show();
 
     // Inits ADCs
     gpio_init(PIN_MUX_A);
@@ -279,15 +277,15 @@ void Hardware::ShowStartupMessage(const StartupMessage message)
     {
         for (Led led : EnumRange<Led>())
         {
-            pixels.SetPixelColor(static_cast<size_t>(led), color);
+            pixels_.SetPixelColor(static_cast<size_t>(led), color);
         }
-        pixels.Show();
+        pixels_.Show();
         sleep_ms(200);
         for (Led led : EnumRange<Led>())
         {
-            pixels.SetPixelColor(static_cast<size_t>(led), 0x000000);
+            pixels_.SetPixelColor(static_cast<size_t>(led), 0x000000);
         }
-        pixels.Show();
+        pixels_.Show();
         sleep_ms(200);
     }
 }
@@ -745,7 +743,7 @@ void Hardware::LatchLeds()
     uint32_t interrupt_state = save_and_disable_interrupts();
     for (Led led : EnumRange<Led>())
     {
-        pixels.SetPixelColor(static_cast<size_t>(led), led_buffer_[led]);
+        pixels_.SetPixelColor(static_cast<size_t>(led), led_buffer_[led]);
     }
     // Restore interrupts
     restore_interrupts(interrupt_state);
@@ -754,7 +752,7 @@ void Hardware::LatchLeds()
 void Hardware::SendLeds()
 {
     leds_just_updated_ = true;
-    pixels.Show();
+    pixels_.Show();
 }
 
 bool Hardware::GetDigitalIn(const DigitalInput input) const
