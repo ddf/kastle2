@@ -38,6 +38,8 @@ void AppKnoscillator::Init()
     knoscil_ = Knoscil::create(SAMPLE_RATE);
     knoscil_->frequency() = 220.f;
 
+    outData = new Knoscil::SampleType[I2S::kAudioBufferSize];
+
     // disable audio chain, we are doing it ourselves
     Kastle2::base.SetFeatureEnabled(Base::Feature::AUDIO_CHAIN, false);
 
@@ -50,6 +52,7 @@ void AppKnoscillator::DeInit()
 {
     inited_ = false;
     Knoscil::destroy(knoscil_);
+    delete[] outData;
 }
 
 FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t size)
@@ -58,31 +61,25 @@ FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t siz
     {
         return;
     }
-    //char msg[64];
-    Knoscil::SampleType out;
-    for (size_t i = 0; i < size; i++)
+    
+    vessl::array<Knoscil::SampleType> buf(outData, size);
+    knoscil_->generate(buf);
+
+    Knoscil::SampleType samp;
+    vessl::array<q15_t> out(output, size*2);
+    auto reader = buf.getReader();
+    auto writer = out.getWriter();
+    while(writer.available())
     {
-        // read
-        q15_t left = input[2 * i];
-        q15_t right = input[2 * i + 1];
-
-        // code that runs each sample
-        out = knoscil_->generate();
-        left = q31_to_q15(out.left());
-        right = q31_to_q15(out.right());
-        //printf(msg, "%i %i", out.left(), out.right());
-        //Kastle2::debug.PrintLine(msg, strlen(msg));
-
-        // output
-        output[2 * i] = left;
-        output[2 * i + 1] = right;
+        samp = reader.read();
+        writer << q31_to_q15(samp.left()) << q31_to_q15(samp.right());
     }
 
     gDbg.pp = knoscil_->knot().pp();
     gDbg.pq = knoscil_->knot().pq();
     gDbg.pz = knoscil_->knot().pz();
-    gDbg.left = out.left().v_;
-    gDbg.right = out.right().v_;
+    gDbg.left = samp.left().v_;
+    gDbg.right = samp.right().v_;
 
     auto coord = knoscil_->knot().xyz();
     gDbg.x = coord.x.v_;

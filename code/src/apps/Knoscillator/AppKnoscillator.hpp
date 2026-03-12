@@ -109,5 +109,6 @@ private:
     bool inited_ = false;
     Mode mode_ = Mode::FIRST;
     Knoscil* knoscil_ = nullptr;
+    Knoscil::SampleType* outData;
 };
 }
