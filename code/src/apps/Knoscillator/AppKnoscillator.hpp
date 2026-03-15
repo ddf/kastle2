@@ -30,10 +30,9 @@ SOFTWARE.
 #include "common/core/App.hpp"
 #include "common/core/Hardware.hpp"
 #include "common/core/Kastle2.hpp"
-#include "vessl_qmath.hpp"
 #include "vessicle/Knoscillator.h"
 
-using Knoscil = Knoscillator<vessl::q31_t>;
+using Knoscil = Knoscillator<vessl::q31>;
 
 struct KnotDebug 
 {

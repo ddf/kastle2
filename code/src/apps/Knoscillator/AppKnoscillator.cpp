@@ -26,6 +26,7 @@ SOFTWARE.
 #include "AppKnoscillator.hpp"
 #include "common/core/Kastle2.hpp"
 #include "common/utils.hpp"
+#include "vessl_kqmath.hpp"
 
 using namespace kastle2;
 
@@ -72,7 +73,8 @@ FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t siz
     while(writer.available())
     {
         samp = reader.read();
-        writer << q31_to_q15(samp.left()) << q31_to_q15(samp.right());
+        writer << q31_to_q15(vessl::cast<q31_t>(samp.left())) 
+               << q31_to_q15(vessl::cast<q31_t>(samp.right()));
     }
 
     gDbg.pp = knoscil_->knot().pp();
