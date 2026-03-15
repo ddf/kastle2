@@ -14,16 +14,17 @@ namespace vessl
         constexpr q31_t(const q31_t& copy) : v_(copy.v_) {}
         constexpr q31_t(const kastle2::q31_t& v) : v_(v) {}
         
+        explicit constexpr q31_t(const int64_t& v) : v_(kastle2::q31_saturate(v)) {}
         explicit constexpr q31_t(const phase_t& v) : v_(kastle2::Q31_ZERO) { *this = v; }
         explicit constexpr q31_t(const analog_t& v) : v_(kastle2::Q31_ZERO) { *this = v; }
 
         constexpr q31_t& operator=(const q31_t& x) { v_ = x.v_; return *this; }
-        constexpr q31_t& operator=(const phase_t& x) { v_ = x/2; return *this; }
+        constexpr q31_t& operator=(const phase_t& x) { v_ = x.v_>>1; return *this; }
         constexpr q31_t& operator=(const analog_t& x) { v_ = kastle2::float_to_q31(x); return *this; }
 
         constexpr operator kastle2::q31_t() const { return v_; }
         // clamps value to [0,1], expands to phase_t range.
-        explicit constexpr operator phase_t() const { return static_cast<phase_t>(v_)*2; }
+        explicit constexpr operator phase_t() const { return static_cast<uint32_t>(v_)*2u; }
         explicit constexpr operator analog_t() const { return kastle2::q31_to_float(v_); }
 
         // prefix increment
@@ -53,10 +54,10 @@ namespace vessl
     constexpr q31_t cast<q31_t, phase_t>(phase_t from) { return q31_t(from); }
 
     template<>
-    constexpr phase_t cast<phase_t, q31_t>(q31_t from) { return static_cast<phase_t>(from); }
+    constexpr phase_t cast<phase_t, q31_t>(q31_t from) { return from.operator vessl::phase_t(); }
 
     template<>
-    constexpr analog_t cast<analog_t, q31_t>(q31_t from) { return static_cast<analog_t>(from); }
+    constexpr analog_t cast<analog_t, q31_t>(q31_t from) { return from.operator vessl::analog_t(); }
 
     // float_to_q31 clamps [0,1]
     template<>
@@ -68,7 +69,7 @@ namespace vessl
         inline q31_t sinz<q31_t>(phase_t p) { return kastle2::q31_sine(cast<q31_t>(p)); }
         
         template<>
-        inline q31_t cosz<q31_t>(phase_t p) { return kastle2::q31_sine(cast<q31_t>(p + PHASE_HALF/2)); }
+        inline q31_t cosz<q31_t>(phase_t p) { return kastle2::q31_sine(cast<q31_t>(p + PHASE_90)); }
 
         template<>
         inline analog_t sinz<analog_t>(phase_t p) { return cast<analog_t>(sinz<q31_t>(p)); }
@@ -83,16 +84,16 @@ namespace vessl
         inline q31_t lerpp<q31_t>(q31_t begin, q31_t end, phase_t t) 
         { 
             if (t == PHASE_ZERO) return begin;
-            if (t == PHASE_MAX) return end;
-            // convert t to fixed-point, do lerp in q31 space.
-            q31_t qt = t;
+            if (t == PHASE_360) return end;
+            // convert t to q31, do lerp in q31 space.
+            q31_t qt(t);
             return begin + (end-begin)*qt;
         }
 
         template<>
         inline q31_t smooth<q31_t>(q31_t value, q31_t target, analog_t degree) 
         {
-            q31_t qd = degree;
+            q31_t qd(degree);
             return value*qd + (q31_t(kastle2::Q31_MAX) - qd)*target; 
         }
     }
