@@ -12,7 +12,8 @@
                 "wave-bard-with-samples",
                 "example-synth",
                 "template",
-                "knoscillator"
+                "knoscillator",
+                "vessicle"
             ],
             "default": "wave-bard"
         }

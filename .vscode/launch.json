@@ -22,7 +22,8 @@
                 "wave-bard-with-samples",
                 "example-synth",
                 "template",
-                "knoscillator"
+                "knoscillator",
+                "vessicle",
             ],
             "default": "wave-bard"
         }
@@ -74,7 +75,7 @@
                 "continue"
             ],
             "showDevDebugOutput": "parsed", 
-            "liveWatch": { "enabled": false, "samplesPerSecond": 15 }
+            "liveWatch": { "enabled": true, "samplesPerSecond": 15 }
         }
     ]
 }

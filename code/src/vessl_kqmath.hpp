@@ -26,7 +26,7 @@ namespace vessl
         inline q31_t sin<q31_t, phase_t>(phase_t p) { return kastle2::q31_sine(wrap01(p).v_); }
         
         template<>
-        inline q31_t cos<q31_t, phase_t>(phase_t p) { return kastle2::q31_sine(wrap01(p.spill(PHASE_90)).v_); }
+        inline q31_t cos<q31_t, phase_t>(phase_t p) { return sin<q31_t>(p.mod(PHASE_90)); }
     }
 
     namespace easing
