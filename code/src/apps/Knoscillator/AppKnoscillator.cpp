@@ -1,8 +1,8 @@
 /*
 MIT License
 
-Copyright (c) 2024 Marek Mach (Bastl Instruments)
 Copyright (c) 2026 Damien Quartz
+Copyright (c) 2024 Marek Mach (Bastl Instruments)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -62,6 +62,9 @@ FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t siz
     {
         return;
     }
+
+    // silence unused parameter warning.
+    (void)input;
     
     vessl::array<Knoscil::SampleType> buf(outData, size);
     knoscil_->generate(buf);

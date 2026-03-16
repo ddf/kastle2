@@ -26,7 +26,7 @@ namespace vessl
         inline q31_t sin<q31_t, phase_t>(phase_t p) { return kastle2::q31_sine(wrap01(p).v_); }
         
         template<>
-        inline q31_t cos<q31_t, phase_t>(phase_t p) { return kastle2::q31_sine(wrap01(p + PHASE_90).v_); }
+        inline q31_t cos<q31_t, phase_t>(phase_t p) { return kastle2::q31_sine(wrap01(p.spill(PHASE_90)).v_); }
     }
 
     namespace easing
@@ -37,8 +37,8 @@ namespace vessl
             if (t == PHASE_ZERO) return begin;
             if (t == PHASE_360) return end;
             // convert t to q31, do lerp in q31 space.
-            q31_t dt = kastle2::q31_mult(kastle2::q31_sub(end, begin), t.v_);
-            return kastle2::q31_add(begin, dt);
+            q31_t delta = kastle2::q31_mult(kastle2::q31_sub(end, begin), t.v_);
+            return kastle2::q31_add(begin, delta);
         }
 
         template<>
