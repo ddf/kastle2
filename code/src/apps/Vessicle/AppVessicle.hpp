@@ -31,14 +31,17 @@ SOFTWARE.
 #include "common/core/Hardware.hpp"
 #include "common/core/Kastle2.hpp"
 #include "common/dsp/math/qmath.hpp"
+#include "common/dsp/synthesis/Oscillator.hpp"
 #include "vessicle/vessl/vessl.h"
 #include "vessl_kqmath.hpp"
+#include "vessicle/KnotOscillator.h"
 
 namespace kastle2
 {
 class AppVessicle : public App
 {
     using Oscil = vessl::oscil<vessl::waves::cosi<vessl::q31>>;
+    using KnotOscil = KnotOscillator<vessl::q31>;
 
 public:
     /**
@@ -98,6 +101,9 @@ public:
 private:
     bool inited_ = false;
     Mode mode_;
-    Oscil oscil_;
+    vessl::phase_t phase;
+    kastle2::Oscillator koscil_;
+    Oscil voscil_;
+    KnotOscil* knotOscil_;
 };
 }

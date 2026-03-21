@@ -25,18 +25,26 @@ SOFTWARE.
 #include "AppVessicle.hpp"
 #include "common/core/Kastle2.hpp"
 #include "common/utils.hpp"
+#include "vessl_kqmath.hpp"
 
 using namespace kastle2;
 
-static volatile int32_t gOscilPhase;
-static volatile int32_t gOscilInc;
+static volatile vessl::phase_t gOscilPhase;
+static volatile vessl::phase_t gOscilInc;
 
 void AppVessicle::Init()
 {
     inited_ = false;
     mode_ = Mode::FIRST;
-    oscil_.setSampleRate(SAMPLE_RATE);
-    oscil_.fHz() = 220.f;
+    
+    voscil_.setSampleRate(SAMPLE_RATE);
+    voscil_.fHz() = 220.f;
+
+    koscil_.Init(SAMPLE_RATE);
+    koscil_.SetFrequency(voscil_.fHz().readAnalog());
+
+    knotOscil_ = KnotOscil::create(SAMPLE_RATE);
+    knotOscil_->frequency() = voscil_.fHz();
 
     // disable audio chain, we are doing it ourselves
     Kastle2::base.SetFeatureEnabled(Base::Feature::AUDIO_CHAIN, false);
@@ -46,6 +54,7 @@ void AppVessicle::Init()
 
 void AppVessicle::DeInit()
 {
+    delete knotOscil_;
     inited_ = false;
 }
 
@@ -55,6 +64,8 @@ FASTCODE void AppVessicle::AudioLoop(q15_t *input, q15_t *output, size_t size)
     {
         return;
     }
+    vessl::q31 qfreq((int64_t)(voscil_.fHz().readAnalog() * (INT32_MAX / SAMPLE_RATE)));
+    vessl::phase_t inc = vessl::cast<vessl::phase_t>(qfreq);
     for (size_t i = 0; i < size; i++)
     {
         // read
@@ -62,17 +73,38 @@ FASTCODE void AppVessicle::AudioLoop(q15_t *input, q15_t *output, size_t size)
         q15_t right = input[2 * i + 1];
 
         // code that runs each sample
-        vessl::q31 s = oscil_.generate();
-        left = q31_to_q15(vessl::math::sin<q31_t>(oscil_.getPhase()));
-        right = q31_to_q15(vessl::math::cos<q31_t>(oscil_.getPhase()));
+        q31_t ks = koscil_.Process();
+        vessl::q31 vs = voscil_.generate();
+        
+        left = q31_to_q15(ks);
+        //right = q31_to_q15(vessl::math::sin<q31_t>(vessl::cast<vessl::phase_t>(koscil_.GetPhase())));
+        
+        // this works, runs at the same frequency as koscil,
+        // but our sine is a cosine relative to koscil's sine.
+        //right = q31_to_q15(vessl::cast<q31_t>(vs));
+
+        // this works, but runs at half the frequency of koscil
+        // because in their code they run phase at 2x speed.
+        //right = q31_to_q15(vessl::math::sin<q31_t>(phase));
+
+        // this works
+        //right = q31_to_q15(vessl::math::sin<q31_t>(vessl::cast<vessl::phase_t>(koscil_.GetPhase())));
+
+        //phase.v_ += inc.v_;
+        //phase.accum(inc);
+
+        // if all of the above works, this should work.
+        KnotOscil::coord_t xyz = knotOscil_->generate<false>();
+        left = q31_to_q15(vessl::cast<q31_t>(xyz.x));
+        right = q31_to_q15(vessl::cast<q31_t>(xyz.y));
 
         // output
         output[2 * i] = left;
         output[2 * i + 1] = right;
     }
 
-    gOscilPhase = oscil_.getPhase().v_;
-    gOscilInc = oscil_.getInc().v_;
+    gOscilPhase = phase; // oscil_.getPhase().v_;
+    gOscilInc = inc; // oscil_.getInc().v_;
 }
 
 void AppVessicle::UiLoop()
