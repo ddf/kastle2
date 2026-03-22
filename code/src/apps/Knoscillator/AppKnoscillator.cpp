@@ -29,6 +29,7 @@ SOFTWARE.
 #include "vessl_kqmath.hpp"
 
 using namespace kastle2;
+using KnotType = Knoscil::KnotType;
 
 KnotDebug gDbg;
 
@@ -101,14 +102,20 @@ void AppKnoscillator::UiLoop()
     {
     case Mode::FIRST:
         Kastle2::hw.SetLed(Hardware::Led::LED_2, 255, 255, 255);
+        knoscil_->knotTypeA() = KnotType::TFOIL;
+        knoscil_->knotTypeB() = KnotType::LISSA;
         break;
 
     case Mode::SECOND:
         Kastle2::hw.SetLed(Hardware::Led::LED_2, 0, 255, 0);
+        knoscil_->knotTypeA() = KnotType::LISSA;
+        knoscil_->knotTypeB() = KnotType::TORUS;
         break;
 
     case Mode::THIRD:
         Kastle2::hw.SetLed(Hardware::Led::LED_2, 255, 0, 0);
+        knoscil_->knotTypeA() = KnotType::TORUS;
+        knoscil_->knotTypeB() = KnotType::TFOIL;
         break;
     }
 
