@@ -27,10 +27,12 @@ SOFTWARE.
 
 #include <cstddef>
 #include <cstdint>
+
+#include "vessicle/Knoscillator.h"
+
 #include "common/core/App.hpp"
 #include "common/core/Hardware.hpp"
 #include "common/core/Kastle2.hpp"
-#include "vessicle/Knoscillator.h"
 
 using Knoscil = Knoscillator<vessl::q31>;
 

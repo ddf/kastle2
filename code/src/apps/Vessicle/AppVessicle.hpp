@@ -27,14 +27,16 @@ SOFTWARE.
 
 #include <cstddef>
 #include <cstdint>
+
+#include "vessicle/vessl/vessl.h"
+#include "vessicle/KnotOscillator.h"
+#include "common/dsp/math/qmath.hpp"
+#include "vessl_kqmath.hpp"
+
 #include "common/core/App.hpp"
 #include "common/core/Hardware.hpp"
 #include "common/core/Kastle2.hpp"
-#include "common/dsp/math/qmath.hpp"
 #include "common/dsp/synthesis/Oscillator.hpp"
-#include "vessicle/vessl/vessl.h"
-#include "vessl_kqmath.hpp"
-#include "vessicle/KnotOscillator.h"
 
 namespace kastle2
 {

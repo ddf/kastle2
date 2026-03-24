@@ -25,8 +25,8 @@ SOFTWARE.
 */
 
 // Main stuff
-#include "common/core/Kastle2.hpp"
 #include "apps/Knoscillator/AppKnoscillator.hpp"
+#include "common/core/Kastle2.hpp"
 
 using namespace kastle2;
 
