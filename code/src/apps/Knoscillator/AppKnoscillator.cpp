@@ -27,8 +27,10 @@ SOFTWARE.
 #include "common/core/Kastle2.hpp"
 #include "common/utils.hpp"
 #include "vessl_kqmath.hpp"
+#include "KnoscillatorParameterMaps.hpp"
 
 using namespace kastle2;
+using namespace knoscillator;
 using KnotType = Knoscil::KnotType;
 
 KnotDebug gDbg;
@@ -45,7 +47,23 @@ void AppKnoscillator::Init()
     // disable audio chain, we are doing it ourselves
     Kastle2::base.SetFeatureEnabled(Base::Feature::AUDIO_CHAIN, false);
 
-    //Kastle2::debug.SetEnabled(true);
+    // Mode selection
+    mode_selector_.Init();
+
+    pots_[Pot::MODE_MOD] = FancyPot::Create({.pot = Hardware::Pot::POT_4,
+                                            .layer = Hardware::Layer::MODE,
+                                            .initial_value = kModeModDefaultValue,
+                                            .memory_addr = kMemModeMod});
+
+    // Pots need to be initialized
+    for (auto &pot : pots_)
+    {
+        pot->Init(AUDIO_LOOP_RATE);
+    }
+
+    // This disables the next change when the pots are moved
+    // or when the current layer time is over the specified number of ticks
+    mode_selector_.DisableNextChangeWhen(pots_, kModeShortPressUnder);
 
     inited_ = true;
 }
@@ -57,15 +75,18 @@ void AppKnoscillator::DeInit()
     delete[] outData;
 }
 
-FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t size)
+FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *output, size_t size)
 {
     if (!inited_)
     {
         return;
     }
 
-    // silence unused parameter warning.
-    (void)input;
+    // Detect the trigger and do dirty inputs
+    if (trigger_.Process(Kastle2::hw.GetTriggerIn()))
+    {
+        do_trigger_ = true;
+    }
     
     vessl::array<Knoscil::SampleType> buf(outData, size);
     knoscil_->generate(buf);
@@ -79,6 +100,12 @@ FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t siz
         samp = reader.read();
         writer << q31_to_q15(vessl::cast<q31_t>(samp.left())) 
                << q31_to_q15(vessl::cast<q31_t>(samp.right()));
+    }
+
+    // Process pots in audio-rate
+    for (auto &pot : pots_)
+    {
+        pot->Process();
     }
 
     gDbg.pp = knoscil_->knot().pp();
@@ -95,38 +122,64 @@ FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t siz
     gDbg.proj = knoscil_->getProjection().v_;
 }
 
+void AppKnoscillator::Trigger()
+{
+    // Store the current note
+    // Ideally you'd like to use DirtyInputHandler to make sure you have the latest value
+    // But it's OK for this example
+    //pitch_note_cv_ = Kastle2::hw.GetAnalogValue(CV_PITCH_NOTE);
+
+    // Store current mode
+    mode_selector_.TriggerAdcRead();
+
+    // Trigger envelope
+    //env_.Trigger();
+}
+
 void AppKnoscillator::UiLoop()
 {
+    // Handle mode switching
+    mode_selector_.ReadValue();
+    mode_ = static_cast<Mode>(mode_selector_.GetMode());
+
     // Change LED color based on mode
     switch (mode_)
     {
     case Mode::FIRST:
-        Kastle2::hw.SetLed(Hardware::Led::LED_2, 255, 255, 255);
         knoscil_->knotTypeA() = KnotType::TFOIL;
         knoscil_->knotTypeB() = KnotType::LISSA;
         break;
 
     case Mode::SECOND:
-        Kastle2::hw.SetLed(Hardware::Led::LED_2, 0, 255, 0);
         knoscil_->knotTypeA() = KnotType::LISSA;
         knoscil_->knotTypeB() = KnotType::TORUS;
         break;
 
     case Mode::THIRD:
-        Kastle2::hw.SetLed(Hardware::Led::LED_2, 255, 0, 0);
         knoscil_->knotTypeA() = KnotType::TORUS;
         knoscil_->knotTypeB() = KnotType::TFOIL;
         break;
     }
 
-    // Cycle modes
-    if (Kastle2::hw.JustReleased(Hardware::Button::MODE))
+    // Update pots
+    for (auto &pot : pots_)
     {
-        mode_ = EnumIncrement(mode_);
+        pot->ReadValue();
     }
 
-    // set kastle LED
-    Kastle2::hw.SetLed(Hardware::Led::LED_1, 0xFF8090);
+    if (pots_[Pot::MODE_MOD]->HasChanged())
+    {
+        // ideally we'd expand pot rang to phase_t without going thru float, but my brain can't do that right now.
+        float morph = static_cast<float>(pots_[Pot::MODE_MOD]->GetValue()) / POT_MAX;
+        knoscil_->knotMorph() = morph;
+
+        auto colorA = knot_colors_[knoscil_->knotTypeA().read<KnotType>()];
+        auto colorB = knot_colors_[knoscil_->knotTypeB().read<KnotType>()];
+        auto color = WS2812::CrossfadeColors(colorA, colorB, morph*255 + 0.5f);
+
+        Kastle2::hw.SetLed(Hardware::Led::LED_1, color);
+        Kastle2::hw.SetLed(Hardware::Led::LED_2, color);
+    }
 }
 
 void AppKnoscillator::MidiCallback(midi::Message *msg)

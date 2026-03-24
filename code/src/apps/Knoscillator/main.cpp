@@ -29,6 +29,7 @@ SOFTWARE.
 #include "common/core/Kastle2.hpp"
 
 using namespace kastle2;
+using namespace knoscillator;
 
 /**
  * @file main.cpp
