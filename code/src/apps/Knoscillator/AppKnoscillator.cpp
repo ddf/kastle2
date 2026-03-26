@@ -35,6 +35,8 @@ using KnotType = Knoscil::KnotType;
 
 KnotDebug gDbg;
 
+static constexpr size_t outDataSize = I2S::kAudioBufferSize*2;
+
 void AppKnoscillator::Init()
 {
     inited_ = false;
@@ -42,18 +44,47 @@ void AppKnoscillator::Init()
     knoscil_ = Knoscil::create(SAMPLE_RATE);
     knoscil_->frequency() = 220.f;
 
-    outData = new Knoscil::SampleType[I2S::kAudioBufferSize];
+    outData = new Knoscil::SampleType[outDataSize];
+    outData_read_ = 0;
+    outData_write_ = 0;
 
     // disable audio chain, we are doing it ourselves
     Kastle2::base.SetFeatureEnabled(Base::Feature::AUDIO_CHAIN, false);
 
+    // Envelope
+    env_.Init(SAMPLE_RATE);
+    env_.SetAttackTime(0.01f);
+    env_.SetDecayTime(1.0f);
+    env_.SetNonResetting(AdsrEnv::NonResetting::DECAY); // prevents clicks
+    env_value_ = 0;
+    env_enabled_ = false;
+
+    // Allow ENV OUT to be controlled by this App
+    Kastle2::base.SetFeatureEnabled(Base::Feature::ENV_OUT, false);
+
     // Mode selection
     mode_selector_.Init();
 
-    pots_[Pot::MODE_MOD] = FancyPot::Create({.pot = Hardware::Pot::POT_4,
-                                            .layer = Hardware::Layer::MODE,
-                                            .initial_value = kModeModDefaultValue,
-                                            .memory_addr = kMemModeMod});
+    pots_[Pot::ENV] = FancyPot::Create({ 
+        .pot = Hardware::Pot::POT_4,
+        .layer = Hardware::Layer::NORMAL,
+        .deadzone = true,
+    });
+
+        // Shift layer
+    pots_[Pot::ENV_MOD] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_4,
+        .layer = Hardware::Layer::SHIFT,
+        .initial_value = kEnvModDefaultValue,
+        .deadzone = true
+    });
+
+    pots_[Pot::MODE_MOD] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_4,
+        .layer = Hardware::Layer::MODE,
+        .initial_value = kModeModDefaultValue,
+        .memory_addr = kMemModeMod
+    });
 
     // Pots need to be initialized
     for (auto &pot : pots_)
@@ -82,24 +113,46 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
         return;
     }
 
+    // request samples
+    MultiCore::SendMessage(MultiCore::MessageType::SAMPLE_REQUEST);
+
     // Detect the trigger and do dirty inputs
     if (trigger_.Process(Kastle2::hw.GetTriggerIn()))
     {
         do_trigger_ = true;
     }
-    
-    vessl::array<Knoscil::SampleType> buf(outData, size);
-    knoscil_->generate(buf);
+
+    // continue when samples are ready
+    MultiCore::WaitForMessage(MultiCore::MessageType::DONE);
+
+    // kick off second core on next buffer while we process the last one it created
+    MultiCore::SendMessage(MultiCore::MessageType::BEGIN, size);
 
     Knoscil::SampleType samp;
     vessl::array<q15_t> out(output, size*2);
-    auto reader = buf.getReader();
     auto writer = out.getWriter();
     while(writer.available())
     {
-        samp = reader.read();
-        writer << q31_to_q15(vessl::cast<q31_t>(samp.left())) 
-               << q31_to_q15(vessl::cast<q31_t>(samp.right()));
+        samp = outData[outData_read_++];
+
+        q15_t lout = q31_to_q15(vessl::cast<q31_t>(samp.left()));
+        q15_t rout = q31_to_q15(vessl::cast<q31_t>(samp.right()));
+
+        // Calculate the envelope
+        env_value_ = q31_to_q15(env_.Process());
+
+        if (env_enabled_)
+        {
+            lout = q15_mult(lout, env_value_);
+            rout = q15_mult(rout, env_value_);
+        }
+
+        writer << lout << rout;
+
+        if (outData_read_ == outDataSize)
+        {
+            outData_read_ = 0;
+        }
     }
 
     // Process pots in audio-rate
@@ -122,6 +175,13 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
     gDbg.proj = knoscil_->getProjection().v_;
 }
 
+void knoscillator::AppKnoscillator::SecondCoreGenerate(size_t size)
+{
+    vessl::array<Knoscil::SampleType> buf(outData + outData_write_, size);
+    knoscil_->generate(buf);
+    outData_write_ = (outData_write_ + size) % outDataSize;
+}
+
 void AppKnoscillator::Trigger()
 {
     // Store the current note
@@ -133,11 +193,17 @@ void AppKnoscillator::Trigger()
     mode_selector_.TriggerAdcRead();
 
     // Trigger envelope
-    //env_.Trigger();
+    env_.Trigger();
 }
 
 void AppKnoscillator::UiLoop()
 {
+    if (do_trigger_)
+    {
+        Trigger();
+        do_trigger_ = false;
+    }
+
     // Handle mode switching
     mode_selector_.ReadValue();
     mode_ = static_cast<Mode>(mode_selector_.GetMode());
@@ -167,18 +233,63 @@ void AppKnoscillator::UiLoop()
         pot->ReadValue();
     }
 
-    if (pots_[Pot::MODE_MOD]->HasChanged())
+     // Calculate envelope
+    int32_t env_val = pots_[Pot::ENV]->GetValue();
+    env_val += apply_pot_mod_attenuvert(Kastle2::hw.GetAnalogValue(CV_ENV), pots_[Pot::ENV_MOD]->GetValue());
+    env_.SetAttackTime(curve_map(env_val, kMapEnvAttack, MapClamp::TRUE));
+    env_.SetDecayTime(curve_map(env_val, kMapEnvDecay, MapClamp::TRUE));
+    if (pots_[Pot::ENV]->HasChanged())
     {
-        // ideally we'd expand pot rang to phase_t without going thru float, but my brain can't do that right now.
+        env_enabled_ = (env_val > pot(0.05f)) && (env_val < pot(0.95f));
+    }
+
+    // Pass the calculated envelope into ENV output
+    Kastle2::hw.SetEnvOut(((uint32_t)env_value_) >> (15 - 10));
+
+    if (current_knot_color_ == 0 || pots_[Pot::MODE_MOD]->HasChanged())
+    {
+        // @todo when morph is not zero, we are suddenly doing a lot more work in KnotOscillator
+        // because of all of the coefficient lerping. probably need to move it onto the second core
+        // sooner rather than later.
+        
+        // ideally we'd expand pot range to phase_t without going thru float, but my brain can't do that right now.
         float morph = static_cast<float>(pots_[Pot::MODE_MOD]->GetValue()) / POT_MAX;
-        knoscil_->knotMorph() = morph;
+        knoscil_->knotMorph() = vessl::cast<vessl::phase_t>(morph);
 
         auto colorA = knot_colors_[knoscil_->knotTypeA().read<KnotType>()];
         auto colorB = knot_colors_[knoscil_->knotTypeB().read<KnotType>()];
-        auto color = WS2812::CrossfadeColors(colorA, colorB, morph*255 + 0.5f);
+        current_knot_color_ = WS2812::CrossfadeColors(colorA, colorB, morph*255 + 0.5f);
+    }
 
-        Kastle2::hw.SetLed(Hardware::Led::LED_1, color);
-        Kastle2::hw.SetLed(Hardware::Led::LED_2, color);
+    uint8_t bright = (env_value_ >> (15 - 6)) + 63;
+    uint32_t color = WS2812::ApplyBrightness(current_knot_color_, bright);
+    Kastle2::hw.SetLed(Hardware::Led::LED_1, color);
+    Kastle2::hw.SetLed(Hardware::Led::LED_2, color);
+}
+
+FASTCODE void knoscillator::AppKnoscillator::SecondCoreWorker()
+{
+    while (inited_)
+    {
+        if (MultiCore::HasMessage())
+        {
+            // Monitoring second core performance
+            //Kastle2::hw.SetDebugPin(1, 1);
+
+            MultiCore::Message m = MultiCore::GetMessage();
+            switch (m.type)
+            {
+            case MultiCore::MessageType::BEGIN:
+                SecondCoreGenerate(m.data);
+                break;
+
+            case MultiCore::MessageType::SAMPLE_REQUEST:
+                MultiCore::SendMessage(MultiCore::MessageType::DONE);
+                break;
+            }
+
+            //Kastle2::hw.SetDebugPin(1, 0);
+        }
     }
 }
 

@@ -45,6 +45,12 @@ static void process_audio(q15_t *input, q15_t *output, size_t size)
     app.AudioLoop(input, output, size);
 }
 
+static void second_core()
+{
+    app.SecondCoreWorker();
+}
+
+
 static void midi_callback(midi::Message *msg)
 {
     app.MidiCallback(msg);
@@ -62,11 +68,17 @@ int main()
     // Initialize the app
     app.Init();
 
+    // Start second core
+    Kastle2::StartSecondCore(second_core);
+
     // Start I2S
     Kastle2::StartAudio(process_audio);
 
     // Set the MIDI callback
     Kastle2::SetAppMidiCallback(midi_callback);
+
+    // tell second core to start generating
+    MultiCore::SendMessage(MultiCore::MessageType::BEGIN, I2S::kAudioBufferSize);
 
     // Infinite program loop
     while (true)

@@ -33,6 +33,7 @@ SOFTWARE.
 #include "common/core/App.hpp"
 #include "common/core/Hardware.hpp"
 #include "common/core/Kastle2.hpp"
+#include "common/dsp/control/AdsrEnv.hpp"
 
 #include "common/EnumTools.hpp"
 #include "common/controls/FancyMode.hpp"
@@ -93,6 +94,11 @@ public:
     void UiLoop() override;
 
     /**
+     * @brief Called only ONCE when the app is started.
+     */
+    FASTCODE void SecondCoreWorker();
+
+    /**
      * @brief Called when the app is first loaded - initializes the memory values.
      */
     void MemoryInitialization() override {}
@@ -113,6 +119,12 @@ public:
     }
 
 private:
+    /**
+     * @brief Here the second core generates a buffer of knot audio. 
+     * It is called by the SecondCoreWorker.
+     */
+    void SecondCoreGenerate(size_t index);
+
     /**
      * @brief Handle trigger events
      *
@@ -136,6 +148,8 @@ private:
         WS2812::BLUE, ///< Color for TORUS
     };
 
+    uint32_t current_knot_color_ = 0;
+
     enum class Pot
     {
         // commented out until we actually use them because the size of this enum
@@ -145,8 +159,8 @@ private:
         // PITCH_MOD,   ///< Pitch attenuversion amount (POT_1, Normal layer)
         // TIMBRE,      ///< Timbre control - filter cutoff or FM index (POT_6, Normal layer)
         // TIMBRE_MOD,  ///< Timbre attenuversion amount (POT_2, Normal layer)
-        // ENV,         ///< Envelope control (POT_4, Normal layer)
-        // ENV_MOD,     ///< Envelope attenuversion amount (POT_4, Shift layer)
+        ENV,         ///< Envelope control (POT_4, Normal layer)
+        ENV_MOD,     ///< Envelope attenuversion amount (POT_4, Shift layer)
         // RESONANCE,   ///< Filter resonance or FM ratio (POT_6, Shift layer)
         // PITCH_SCALE, ///< Quantizer scale selection (POT_1, Mode layer)
         // PITCH_ROOT,  ///< Root note selection (POT_2, Mode layer)
@@ -184,5 +198,16 @@ private:
     Mode mode_ = Mode::FIRST;
     Knoscil* knoscil_ = nullptr;
     Knoscil::SampleType* outData;
+    vessl::size_t outData_read_;
+    vessl::size_t outData_write_;
+
+    /** @brief ADSR envelope generator */
+    AdsrEnv env_;
+
+    /** @brief Current envelope value in q15 format */
+    q15_t env_value_ = 0;
+
+    /** @brief Flag indicating whether envelope is active (controlled by ENV pot position) */
+    bool env_enabled_ = false;
 };
 }
