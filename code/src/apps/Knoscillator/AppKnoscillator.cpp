@@ -247,11 +247,7 @@ void AppKnoscillator::UiLoop()
     Kastle2::hw.SetEnvOut(((uint32_t)env_value_) >> (15 - 10));
 
     if (current_knot_color_ == 0 || pots_[Pot::MODE_MOD]->HasChanged())
-    {
-        // @todo when morph is not zero, we are suddenly doing a lot more work in KnotOscillator
-        // because of all of the coefficient lerping. probably need to move it onto the second core
-        // sooner rather than later.
-        
+    {   
         // ideally we'd expand pot range to phase_t without going thru float, but my brain can't do that right now.
         float morph = static_cast<float>(pots_[Pot::MODE_MOD]->GetValue()) / POT_MAX;
         knoscil_->knotMorph() = vessl::cast<vessl::phase_t>(morph);

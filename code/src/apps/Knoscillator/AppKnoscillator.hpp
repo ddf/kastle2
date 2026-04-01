@@ -123,7 +123,7 @@ private:
      * @brief Here the second core generates a buffer of knot audio. 
      * It is called by the SecondCoreWorker.
      */
-    void SecondCoreGenerate(size_t index);
+    FASTCODE void SecondCoreGenerate(size_t index);
 
     /**
      * @brief Handle trigger events
