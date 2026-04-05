@@ -51,6 +51,11 @@ void AppKnoscillator::Init()
     // disable audio chain, we are doing it ourselves
     Kastle2::base.SetFeatureEnabled(Base::Feature::AUDIO_CHAIN, false);
 
+    // Quantizer
+    quantizer_.Init(0.8f);
+    quantizer_.SetEnabled(true);
+    quantizer_.SetScale(Quantizer::DefaultScale::CHROMATIC);
+
     // Envelope
     env_.Init(SAMPLE_RATE);
     env_.SetAttackTime(0.01f);
@@ -65,18 +70,74 @@ void AppKnoscillator::Init()
     // Mode selection
     mode_selector_.Init();
 
+    pots_[Pot::PITCH] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_5,
+        .layer = Hardware::Layer::NORMAL,
+        .freeze = true,
+    });
+
+    pots_[Pot::PITCH_MOD] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_1,
+        .layer = Hardware::Layer::NORMAL,
+        .deadzone = true,
+        .freeze = true,
+    });
+
     pots_[Pot::ENV] = FancyPot::Create({ 
         .pot = Hardware::Pot::POT_4,
         .layer = Hardware::Layer::NORMAL,
         .deadzone = true,
     });
 
-        // Shift layer
+    pots_[Pot::TIMBRE] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_6,                             
+        .layer = Hardware::Layer::NORMAL
+    });
+
+    pots_[Pot::TIMBRE_MOD] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_2,
+        .layer = Hardware::Layer::NORMAL,
+        .deadzone = true,
+    });
+
+    // Shift layer
     pots_[Pot::ENV_MOD] = FancyPot::Create({
         .pot = Hardware::Pot::POT_4,
         .layer = Hardware::Layer::SHIFT,
         .initial_value = kEnvModDefaultValue,
         .deadzone = true
+    });
+
+    pots_[Pot::FM_RATIO] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_6,
+        .layer = Hardware::Layer::SHIFT,
+        .initial_value = kResonanceDefaultValue,
+        .deadzone = true
+    });
+
+    // Mode layer
+    pots_[Pot::PITCH_SCALE] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_1,
+        .layer = Hardware::Layer::MODE,
+        .initial_value = kPitchScaleDefaultValue,
+        .map_size = quantizer_.GetScaleTableSize(), // quantizer needs to be initialized before calling this
+        .memory_addr = kMemPitchScale
+    });
+
+    pots_[Pot::PITCH_ROOT] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_2,
+        .layer = Hardware::Layer::MODE,
+        .initial_value = kPitchRootDefaultValue,
+        .map_size = Quantizer::kMultiplierTable.size(),
+        .memory_addr = kMemPitchRoot
+    });
+
+    pots_[Pot::PITCH_FINE] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_3,
+        .layer = Hardware::Layer::MODE,
+        .initial_value = kPitchFineDefaultValue,
+        .deadzone = true,
+        .memory_addr = kMemPitchFine
     });
 
     pots_[Pot::MODE_MOD] = FancyPot::Create({
@@ -187,7 +248,7 @@ void AppKnoscillator::Trigger()
     // Store the current note
     // Ideally you'd like to use DirtyInputHandler to make sure you have the latest value
     // But it's OK for this example
-    //pitch_note_cv_ = Kastle2::hw.GetAnalogValue(CV_PITCH_NOTE);
+    pitch_note_cv_ = Kastle2::hw.GetAnalogValue(CV_PITCH_NOTE);
 
     // Store current mode
     mode_selector_.TriggerAdcRead();
@@ -232,6 +293,49 @@ void AppKnoscillator::UiLoop()
     {
         pot->ReadValue();
     }
+
+    // Quantizer Scale selection based on the pot value
+    int32_t quantizer_scale = pots_[Pot::PITCH_SCALE]->GetMappedValue();
+    quantizer_.SetScale(quantizer_scale >= 0 ? quantizer_scale : 0);
+
+    // Raw pitch value from the pot
+    float base_pitch = std::pow(2.0f, curve_map(pots_[Pot::PITCH]->GetValue(), kMapFreePitch));
+
+    // Apply NOTE PITCH mod
+    int32_t pitch_mod_pot = pots_[Pot::PITCH_MOD]->GetValue();
+    int32_t pitch_note_mod = apply_pot_mod_attenuvert(pitch_note_cv_, pitch_mod_pot);
+    base_pitch *= std::pow(2.0f, static_cast<float>(pitch_note_mod) / static_cast<float>(ADC_1V)); // V/Oct
+
+    // Multiply by base frequency
+    base_pitch *= kBaseTune;
+
+    // Apply quantization
+    base_pitch = quantizer_.Process(base_pitch);
+
+    // Apply quantization root note
+    int32_t quantizer_root = pots_[Pot::PITCH_ROOT]->GetMappedValue();
+    base_pitch *= Quantizer::kMultiplierTable[quantizer_root];
+
+    // Apply FREE PITCH mod
+    int32_t pitch_free_mod = apply_pot_mod_attenuvert(Kastle2::hw.GetAnalogValue(CV_PITCH_FREE), pitch_mod_pot);
+    base_pitch *= std::pow(2.0f, static_cast<float>(pitch_free_mod) / static_cast<float>(ADC_1V)); // V/Oct
+
+    // Add fine tuning
+    base_pitch *= curve_map(pots_[Pot::PITCH_FINE]->GetValue(), kMapPitchFine);
+
+    // Clamp the frequency
+    base_pitch = fmin(base_pitch, kMaxPitchHz);
+
+    // Calculate timbre and fm ratio settings
+    volatile int32_t timbre_val = pots_[Pot::TIMBRE]->GetValue();
+    timbre_val += apply_pot_mod_attenuvert(Kastle2::hw.GetAnalogValue(CV_TIMBRE), pots_[Pot::TIMBRE_MOD]->GetValue());
+    volatile int32_t fm_ratio_val = pots_[Pot::FM_RATIO]->GetValue();
+    volatile float fm_index = q31_to_float(curve_map(timbre_val, kMapFmIndex, MapClamp::TRUE, MapSafe::TRUE));
+    volatile float fm_ratio = 4.f * q31_to_float(curve_map(fm_ratio_val, kMapFmRatio, MapClamp::TRUE, MapSafe::TRUE));
+
+    knoscil_->frequency() = base_pitch;
+    knoscil_->fmIndex() = fm_index;
+    knoscil_->fmRatio() = fm_ratio;
 
      // Calculate envelope
     int32_t env_val = pots_[Pot::ENV]->GetValue();

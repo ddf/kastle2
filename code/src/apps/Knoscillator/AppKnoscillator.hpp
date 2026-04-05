@@ -34,12 +34,15 @@ SOFTWARE.
 #include "common/core/Hardware.hpp"
 #include "common/core/Kastle2.hpp"
 #include "common/dsp/control/AdsrEnv.hpp"
+#include "common/dsp/utility/Quantizer.hpp"
 
 #include "common/EnumTools.hpp"
 #include "common/controls/FancyMode.hpp"
 #include "common/controls/FancyPot.hpp"
 
-using Knoscil = Knoscillator<vessl::q31>;
+// not only do we not have the processing power to smooth P&Q,
+// trying to use that code overflows the FASTCODE section of the binary.
+using Knoscil = Knoscillator<vessl::q31, false>;
 
 struct KnotDebug 
 {
@@ -155,16 +158,16 @@ private:
         // commented out until we actually use them because the size of this enum
         // determines the size of the pots_ array.
 
-        // PITCH,       ///< Main pitch control (POT_5, Normal layer)
-        // PITCH_MOD,   ///< Pitch attenuversion amount (POT_1, Normal layer)
-        // TIMBRE,      ///< Timbre control - filter cutoff or FM index (POT_6, Normal layer)
-        // TIMBRE_MOD,  ///< Timbre attenuversion amount (POT_2, Normal layer)
+        PITCH,       ///< Main pitch control (POT_5, Normal layer)
+        PITCH_MOD,   ///< Pitch attenuversion amount (POT_1, Normal layer)
+        TIMBRE,      ///< Timbre control - FM index (POT_6, Normal layer)
+        TIMBRE_MOD,  ///< Timbre attenuversion amount (POT_2, Normal layer)
         ENV,         ///< Envelope control (POT_4, Normal layer)
         ENV_MOD,     ///< Envelope attenuversion amount (POT_4, Shift layer)
-        // RESONANCE,   ///< Filter resonance or FM ratio (POT_6, Shift layer)
-        // PITCH_SCALE, ///< Quantizer scale selection (POT_1, Mode layer)
-        // PITCH_ROOT,  ///< Root note selection (POT_2, Mode layer)
-        // PITCH_FINE,  ///< Fine pitch tuning (POT_3, Mode layer)
+        FM_RATIO,    ///< FM ratio (POT_6, Shift layer)
+        PITCH_SCALE, ///< Quantizer scale selection (POT_1, Mode layer)
+        PITCH_ROOT,  ///< Root note selection (POT_2, Mode layer)
+        PITCH_FINE,  ///< Fine pitch tuning (POT_3, Mode layer)
         // FX,          ///< Delay effect wet/dry mix (POT_2, Shift layer)
         MODE_MOD,    ///< Mode attenuation control (POT_4, Mode layer)
         COUNT        ///< Total number of potentiometer controls
@@ -200,6 +203,12 @@ private:
     Knoscil::SampleType* outData;
     vessl::size_t outData_read_;
     vessl::size_t outData_write_;
+
+    /** @brief Pitch quantizer for musical note quantization */
+    Quantizer quantizer_;
+
+    /** @brief Stored CV value for quantized pitch input (V/Oct) */
+    int32_t pitch_note_cv_ = 0;
 
     /** @brief ADSR envelope generator */
     AdsrEnv env_;

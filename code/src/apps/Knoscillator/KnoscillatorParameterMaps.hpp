@@ -41,32 +41,38 @@ static constexpr float kMaxPitchHz = 15000.0f;
 // Octave selection
 static constexpr auto kMapFreePitch = MapDef<float, 7>{
     {pot(0.0f), pot(0.166f), pot(0.333f), pot(0.500f), pot(0.666f), pot(0.833f), pot(1.0f)},
-    {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f}};
+    {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f}
+};
 
 // Fine tuning
 static constexpr auto kMapPitchFine = MapDef<float, 3>{
     {pot(0.0f), pot(0.5f), pot(1.0f)},
-    {0.943874313f, 1.f, 1.059463094f}};
+    {0.943874313f, 1.f, 1.059463094f}
+};
 
 // Filter frequency
 static constexpr auto kMapFilterFreq = MapDef<float, 5>{
     {pot(0.0f), pot(0.25f), pot(0.5f), pot(0.75f), pot(1.0f)},
-    {50.0f, 165.7f, 547.7f, 1814.2f, 6000.0f}};
+    {50.0f, 165.7f, 547.7f, 1814.2f, 6000.0f}
+};
 
 // Filter resonance
 static constexpr auto kMapResonance = MapDef<float, 3>{
     {pot(0.0f), pot(0.5f), pot(1.0f)},
-    {0.1f, 0.6f, 0.95f}};
+    {0.1f, 0.6f, 0.95f}
+};
 
 // FM index (depth)
 static constexpr auto kMapFmIndex = MapDef<int32_t, 3>{
     {pot(0.0f), pot(0.5f), pot(1.0f)},
-    {q31(0.01f), q31(0.5f), q31(0.8f)}};
+    {q31(0.01f), q31(0.5f), q31(0.8f)}
+};
 
 // FM ratio (oscillator ratios)
-static constexpr auto kMapFmRatio = MapDef<int32_t, 3>{
-    {pot(0.0f), pot(0.5f), pot(1.0f)},
-    {q31(0.2f), q31(0.5f), q31(0.75f)}};
+static constexpr auto kMapFmRatio = MapDef<int32_t, 4>{
+    {pot(0.0f), pot(0.5f), pot(0.9f), pot(1.f)},
+    {q31(0.25f), q31(0.5f), q31(1.f), q31(1.f)}
+};
 
 // ENV pot to attack mapping
 static constexpr auto kMapEnvAttack = MapDef<float, 5>{
