@@ -163,6 +163,8 @@ private:
         TIMBRE,      ///< Timbre control - FM index (POT_6, Normal layer)
         TIMBRE_MOD,  ///< Timbre attenuversion amount (POT_2, Normal layer)
         ENV,         ///< Envelope control (POT_4, Normal layer)
+        LFO,         ///< Rotation rate control (POT_7, Normal layer)
+        LFO_MOD,     ///< Rotation rate modulation (POT_3, Normal layer)
         ENV_MOD,     ///< Envelope attenuversion amount (POT_4, Shift layer)
         FM_RATIO,    ///< FM ratio (POT_6, Shift layer)
         PITCH_SCALE, ///< Quantizer scale selection (POT_1, Mode layer)
@@ -178,6 +180,7 @@ private:
     static constexpr Hardware::AnalogInput CV_MODE = Hardware::AnalogInput::MODE;          ///< CV input for mode selection
     static constexpr Hardware::AnalogInput CV_PITCH_FREE = Hardware::AnalogInput::PITCH_1; ///< CV input for free pitch modulation
     static constexpr Hardware::AnalogInput CV_PITCH_NOTE = Hardware::AnalogInput::PITCH_2; ///< CV input for quantized pitch (V/Oct)
+    static constexpr Hardware::AnalogInput CV_LFO_MOD = Hardware::AnalogInput::PARAM_2;    ///< CV input for LFO MOD
 
     EnumArray<Pot, std::unique_ptr<FancyPot>> pots_;
 
@@ -209,6 +212,9 @@ private:
 
     /** @brief Stored CV value for quantized pitch input (V/Oct) */
     int32_t pitch_note_cv_ = 0;
+
+    /** @brief Current Y-Rotation value in q15 format */
+    q15_t rot_y_value_ = 0;
 
     /** @brief ADSR envelope generator */
     AdsrEnv env_;

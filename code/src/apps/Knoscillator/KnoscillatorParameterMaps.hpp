@@ -74,6 +74,12 @@ static constexpr auto kMapFmRatio = MapDef<int32_t, 4>{
     {q31(0.25f), q31(0.5f), q31(1.f), q31(1.f)}
 };
 
+// Rotation ratio
+static constexpr auto kMapRotRatio = MapDef<int32_t, 3>{
+    {pot(0.f), pot(0.5f), pot(1.f)},
+    {q31(-1.f), q31(0.f), q31(1.f)}
+};
+
 // ENV pot to attack mapping
 static constexpr auto kMapEnvAttack = MapDef<float, 5>{
     {pot(0.0f), pot(0.25f), pot(0.5f), pot(0.75f), pot(1.0f)},

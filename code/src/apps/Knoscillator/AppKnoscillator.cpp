@@ -66,6 +66,8 @@ void AppKnoscillator::Init()
 
     // Allow ENV OUT to be controlled by this App
     Kastle2::base.SetFeatureEnabled(Base::Feature::ENV_OUT, false);
+    // Allow LFO to be controlled by this App
+    Kastle2::base.SetFeatureEnabled(Base::Feature::LFO_OUT, false);
 
     // Mode selection
     mode_selector_.Init();
@@ -98,6 +100,18 @@ void AppKnoscillator::Init()
         .pot = Hardware::Pot::POT_2,
         .layer = Hardware::Layer::NORMAL,
         .deadzone = true,
+    });
+
+    pots_[Pot::LFO] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_7,
+        .layer = Hardware::Layer::NORMAL,
+        .deadzone = true,
+    });
+
+    pots_[Pot::LFO_MOD] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_3,
+        .layer = Hardware::Layer::NORMAL,
+        .deadzone = true
     });
 
     // Shift layer
@@ -185,6 +199,10 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
 
     // continue when samples are ready
     MultiCore::WaitForMessage(MultiCore::MessageType::DONE);
+
+    // capture and convert rotation to q15 [0,1]
+    q31_t rotY = vessl::cast<q31_t>(knoscil_->rotationY().read<vessl::q31>());
+    rot_y_value_ = q31_to_q15(q31_add(q31_mult(rotY, Q31_HALF), Q31_HALF));
 
     // kick off second core on next buffer while we process the last one it created
     MultiCore::SendMessage(MultiCore::MessageType::BEGIN, size);
@@ -327,15 +345,21 @@ void AppKnoscillator::UiLoop()
     base_pitch = fmin(base_pitch, kMaxPitchHz);
 
     // Calculate timbre and fm ratio settings
-    volatile int32_t timbre_val = pots_[Pot::TIMBRE]->GetValue();
+    int32_t timbre_val = pots_[Pot::TIMBRE]->GetValue();
     timbre_val += apply_pot_mod_attenuvert(Kastle2::hw.GetAnalogValue(CV_TIMBRE), pots_[Pot::TIMBRE_MOD]->GetValue());
-    volatile int32_t fm_ratio_val = pots_[Pot::FM_RATIO]->GetValue();
-    volatile float fm_index = q31_to_float(curve_map(timbre_val, kMapFmIndex, MapClamp::TRUE, MapSafe::TRUE));
-    volatile float fm_ratio = 4.f * q31_to_float(curve_map(fm_ratio_val, kMapFmRatio, MapClamp::TRUE, MapSafe::TRUE));
+    int32_t fm_ratio_val = pots_[Pot::FM_RATIO]->GetValue();
+    float fm_index = q31_to_float(curve_map(timbre_val, kMapFmIndex, MapClamp::TRUE, MapSafe::TRUE));
+    float fm_ratio = 4.f * q31_to_float(curve_map(fm_ratio_val, kMapFmRatio, MapClamp::TRUE, MapSafe::TRUE));
+
+    // Calculate rotation settings
+    int32_t rot_val = pots_[Pot::LFO]->GetValue();
+    rot_val += apply_pot_mod_attenuvert(Kastle2::hw.GetAnalogValue(CV_LFO_MOD), pots_[Pot::LFO_MOD]->GetValue());
+    volatile float rot_ratio = 4.f * q31_to_float(curve_map(rot_val, kMapRotRatio, MapClamp::TRUE, MapSafe::TRUE));
 
     knoscil_->frequency() = base_pitch;
     knoscil_->fmIndex() = fm_index;
     knoscil_->fmRatio() = fm_ratio;
+    knoscil_->rotRatioY() = rot_ratio; 
 
      // Calculate envelope
     int32_t env_val = pots_[Pot::ENV]->GetValue();
@@ -349,6 +373,9 @@ void AppKnoscillator::UiLoop()
 
     // Pass the calculated envelope into ENV output
     Kastle2::hw.SetEnvOut(((uint32_t)env_value_) >> (15 - 10));
+    // Pass the captured rotation to the LFO TRI output
+    Kastle2::hw.SetTriOut(((uint32_t)rot_y_value_) >> (15 - 10));
+    Kastle2::hw.SetPulseOut(rot_y_value_ > Q15_HALF);
 
     if (current_knot_color_ == 0 || pots_[Pot::MODE_MOD]->HasChanged())
     {   
