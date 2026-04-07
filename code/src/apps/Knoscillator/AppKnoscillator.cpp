@@ -40,7 +40,7 @@ static constexpr size_t outDataSize = I2S::kAudioBufferSize*2;
 void AppKnoscillator::Init()
 {
     inited_ = false;
-    mode_ = Mode::FIRST;
+    mode_ = Mode::TFOIL_LISSA;
     knoscil_ = Knoscil::create(SAMPLE_RATE);
     knoscil_->frequency() = 220.f;
 
@@ -161,6 +161,20 @@ void AppKnoscillator::Init()
         .memory_addr = kMemModeMod
     });
 
+    pots_[Pot::KNOT_P] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_5,
+        .layer = Hardware::Layer::MODE,
+        .initial_value = kKnotPDefaultValue,
+        .memory_addr = kMemModeKnotP
+    });
+
+    pots_[Pot::KNOT_Q] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_6,
+        .layer = Hardware::Layer::MODE,
+        .initial_value = kKnotQDefaultValue,
+        .memory_addr = kMemModeKnotQ
+    });
+
     // Pots need to be initialized
     for (auto &pot : pots_)
     {
@@ -247,9 +261,14 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
     gDbg.right = samp.right().v_;
 
     auto coord = knoscil_->knot().xyz();
-    gDbg.x = coord.x.v_;
-    gDbg.y = coord.y.v_;
-    gDbg.z = coord.z.v_;
+    gDbg.kx = coord.x.v_;
+    gDbg.ky = coord.y.v_;
+    gDbg.kz = coord.z.v_;
+    gDbg.rx = knoscil_->knotCoordRotated.x.v_;
+    gDbg.ry = knoscil_->knotCoordRotated.y.v_;
+    gDbg.rz = knoscil_->knotCoordRotated.z.v_;
+    gDbg.cx = vessl::cast<vessl::analog_t>(coord.x);
+    gDbg.cy = vessl::cast<vessl::analog_t>(coord.y);
     gDbg.cz = vessl::cast<vessl::analog_t>(coord.z);
     gDbg.proj = knoscil_->getProjection().v_;
 }
@@ -290,17 +309,17 @@ void AppKnoscillator::UiLoop()
     // Change LED color based on mode
     switch (mode_)
     {
-    case Mode::FIRST:
+    case Mode::TFOIL_LISSA:
         knoscil_->knotTypeA() = KnotType::TFOIL;
         knoscil_->knotTypeB() = KnotType::LISSA;
         break;
 
-    case Mode::SECOND:
+    case Mode::LISSA_TORUS:
         knoscil_->knotTypeA() = KnotType::LISSA;
         knoscil_->knotTypeB() = KnotType::TORUS;
         break;
 
-    case Mode::THIRD:
+    case Mode::TORUS_TFOIL:
         knoscil_->knotTypeA() = KnotType::TORUS;
         knoscil_->knotTypeB() = KnotType::TFOIL;
         break;
@@ -349,17 +368,27 @@ void AppKnoscillator::UiLoop()
     timbre_val += apply_pot_mod_attenuvert(Kastle2::hw.GetAnalogValue(CV_TIMBRE), pots_[Pot::TIMBRE_MOD]->GetValue());
     int32_t fm_ratio_val = pots_[Pot::FM_RATIO]->GetValue();
     float fm_index = q31_to_float(curve_map(timbre_val, kMapFmIndex, MapClamp::TRUE, MapSafe::TRUE));
-    float fm_ratio = 4.f * q31_to_float(curve_map(fm_ratio_val, kMapFmRatio, MapClamp::TRUE, MapSafe::TRUE));
+    float fm_ratio = 8.f * q31_to_float(curve_map(fm_ratio_val, kMapFmRatio, MapClamp::TRUE, MapSafe::TRUE));
 
     // Calculate rotation settings
     int32_t rot_val = pots_[Pot::LFO]->GetValue();
     rot_val += apply_pot_mod_attenuvert(Kastle2::hw.GetAnalogValue(CV_LFO_MOD), pots_[Pot::LFO_MOD]->GetValue());
-    volatile float rot_ratio = 4.f * q31_to_float(curve_map(rot_val, kMapRotRatio, MapClamp::TRUE, MapSafe::TRUE));
+    float rot_ratio = 4.f * q31_to_float(curve_map(rot_val, kMapRotRatio, MapClamp::TRUE, MapSafe::TRUE));
+
+    volatile int32_t knot_p_val = pots_[Pot::KNOT_P]->GetValue();
+    volatile int32_t knot_q_val = pots_[Pot::KNOT_Q]->GetValue();
+    volatile int32_t knot_p = curve_map(knot_p_val, kMapKnotPQ, MapClamp::TRUE, MapSafe::TRUE);
+    volatile int32_t knot_q = curve_map(knot_q_val, kMapKnotPQ, MapClamp::TRUE, MapSafe::TRUE);
 
     knoscil_->frequency() = base_pitch;
     knoscil_->fmIndex() = fm_index;
     knoscil_->fmRatio() = fm_ratio;
-    knoscil_->rotRatioY() = rot_ratio; 
+    // chosen on vibes by playing around with it
+    knoscil_->rotRatioY() = rot_ratio;
+    knoscil_->rotRatioX() = -rot_ratio / 4;
+    knoscil_->rotRatioZ() = rot_ratio / 8;
+    knoscil_->knotP() = knot_p;
+    knoscil_->knotQ() = knot_q;
 
      // Calculate envelope
     int32_t env_val = pots_[Pot::ENV]->GetValue();
@@ -424,4 +453,17 @@ void AppKnoscillator::MidiCallback(midi::Message *msg)
 {
     // Do something here...
     (void)msg;
+}
+
+void knoscillator::AppKnoscillator::MemoryInitialization()
+{
+    Kastle2::memory.Write8(kMemMode, std::to_underlying(Mode::TFOIL_LISSA));
+    Kastle2::memory.Write8(kMemFx, pot_to_mem(kFxDefaultValue));
+    Kastle2::memory.Write8(kMemEnvMod, pot_to_mem(kEnvModDefaultValue));
+    Kastle2::memory.Write8(kMemPitchScale, pot_to_mem(kPitchScaleDefaultValue));
+    Kastle2::memory.Write8(kMemPitchRoot, pot_to_mem(kPitchRootDefaultValue));
+    Kastle2::memory.Write8(kMemPitchFine, pot_to_mem(kPitchFineDefaultValue));
+    Kastle2::memory.Write8(kMemModeMod, pot_to_mem(kModeModDefaultValue));
+    Kastle2::memory.Write8(kMemModeKnotP, pot_to_mem(kKnotPDefaultValue));
+    Kastle2::memory.Write8(kMemModeKnotQ, pot_to_mem(kKnotQDefaultValue));
 }

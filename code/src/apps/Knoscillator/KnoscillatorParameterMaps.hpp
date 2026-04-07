@@ -38,6 +38,9 @@ static constexpr float kBaseTune = 32.71875f;
 // Max pitch frequency in Hz (applied after all modulations and transpositions)
 static constexpr float kMaxPitchHz = 15000.0f;
 
+// Max value for P and Q
+static constexpr int32_t kMaxKnotPQ = 8;
+
 // Octave selection
 static constexpr auto kMapFreePitch = MapDef<float, 7>{
     {pot(0.0f), pot(0.166f), pot(0.333f), pot(0.500f), pot(0.666f), pot(0.833f), pot(1.0f)},
@@ -75,25 +78,35 @@ static constexpr auto kMapFmRatio = MapDef<int32_t, 4>{
 };
 
 // Rotation ratio
-static constexpr auto kMapRotRatio = MapDef<int32_t, 3>{
-    {pot(0.f), pot(0.5f), pot(1.f)},
-    {q31(-1.f), q31(0.f), q31(1.f)}
+static constexpr auto kMapRotRatio = MapDef<int32_t, 5>{
+    {pot(0.f), pot(0.25), pot(0.5f), pot(0.75), pot(1.f)},
+    {q31(-1.f), q31(-0.25f), q31(0.f), q31(0.25f), q31(1.f)}
 };
 
 // ENV pot to attack mapping
 static constexpr auto kMapEnvAttack = MapDef<float, 5>{
     {pot(0.0f), pot(0.25f), pot(0.5f), pot(0.75f), pot(1.0f)},
-    {1.0f, 0.2f, 0.005f, 0.005f, 0.005f}};
+    {1.0f, 0.2f, 0.005f, 0.005f, 0.005f}
+};
 
 // ENV pot to decay mapping
 static constexpr auto kMapEnvDecay = MapDef<float, 5>{
     {pot(0.0f), pot(0.25f), pot(0.5f), pot(0.75f), pot(1.0f)},
-    {1.0f, 0.2f, 0.05f, 0.5f, 2.0f}};
+    {1.0f, 0.2f, 0.05f, 0.5f, 2.0f}
+};
+
+// PQ settings
+static constexpr auto kMapKnotPQ = MapDef<int32_t, kMaxKnotPQ>{
+    {pot(0.0f), pot(1.f/kMaxKnotPQ), pot(2.f/kMaxKnotPQ), pot(3.f/kMaxKnotPQ), pot(4.f/kMaxKnotPQ), pot(5.f/kMaxKnotPQ), pot(6.f/kMaxKnotPQ), pot(7.f/kMaxKnotPQ)},
+    {1, 2, 3, 4, 5, 6, 7, 8}
+};
 
 // Default POT values
 static constexpr int32_t kPitchScaleDefaultValue = pot(0.6f);
 static constexpr int32_t kPitchRootDefaultValue = pot(0.0f);
 static constexpr int32_t kPitchFineDefaultValue = pot(0.5f);
+static constexpr int32_t kKnotPDefaultValue = pot(1.f/kMaxKnotPQ);
+static constexpr int32_t kKnotQDefaultValue = pot(0.f);
 static constexpr int32_t kFxDefaultValue = pot(0.5f);
 static constexpr int32_t kResonanceDefaultValue = pot(0.0f);
 static constexpr int32_t kModeModDefaultValue = pot(0.0f);

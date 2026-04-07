@@ -47,8 +47,9 @@ using Knoscil = Knoscillator<vessl::q31, false>;
 struct KnotDebug 
 {
     vessl::phase_t pp, pq, pz;
-    kastle2::q31_t x, y, z, proj;
-    vessl::analog_t cz;
+    kastle2::q31_t kx, ky, kz;
+    kastle2::q31_t rx, ry, rz, proj;
+    vessl::analog_t cx, cy, cz;
     kastle2::q31_t left, right;
 };
 
@@ -67,9 +68,9 @@ public:
      */
     enum class Mode
     {
-        FIRST,
-        SECOND,
-        THIRD,
+        TFOIL_LISSA,
+        LISSA_TORUS,
+        TORUS_TFOIL,
         COUNT
     };
 
@@ -104,7 +105,7 @@ public:
     /**
      * @brief Called when the app is first loaded - initializes the memory values.
      */
-    void MemoryInitialization() override {}
+    void MemoryInitialization() override;
 
     /**
      * @brief Handles incoming MIDI messages.
@@ -172,6 +173,8 @@ private:
         PITCH_FINE,  ///< Fine pitch tuning (POT_3, Mode layer)
         // FX,          ///< Delay effect wet/dry mix (POT_2, Shift layer)
         MODE_MOD,    ///< Mode attenuation control (POT_4, Mode layer)
+        KNOT_P,      ///< Knot P value (POT_5, Mode layer)
+        KNOT_Q,      ///< Knot Q value (POT_6, Mode layer)
         COUNT        ///< Total number of potentiometer controls
     };
 
@@ -200,8 +203,10 @@ private:
     static constexpr size_t kMemPitchRoot = Memory::ADDR_APP_SPACE + 0x4;  ///< Memory address for pitch root note setting
     static constexpr size_t kMemPitchFine = Memory::ADDR_APP_SPACE + 0x5;  ///< Memory address for fine pitch setting
     static constexpr size_t kMemModeMod = Memory::ADDR_APP_SPACE + 0x6;    ///< Memory address for mode modulation setting
+    static constexpr size_t kMemModeKnotP = Memory::ADDR_APP_SPACE + 0x7;  ///< Memory address for Knot P setting
+    static constexpr size_t kMemModeKnotQ = Memory::ADDR_APP_SPACE + 0x8;  ///< Memory address for Knot Q setting
 
-    Mode mode_ = Mode::FIRST;
+    Mode mode_ = Mode::TFOIL_LISSA;
     Knoscil* knoscil_ = nullptr;
     Knoscil::SampleType* outData;
     vessl::size_t outData_read_;
