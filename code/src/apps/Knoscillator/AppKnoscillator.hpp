@@ -147,9 +147,9 @@ private:
 
         /** @brief LED colors for each knot type */
     EnumArray<Knoscil::KnotType, uint32_t> knot_colors_ = {
-        WS2812::ORANGE, ///< Color for TFOIL
-        WS2812::GREEN, ///< Color for LISSA
-        WS2812::BLUE, ///< Color for TORUS
+        WS2812::TEAL, ///< Color for TFOIL
+        WS2812::LIME, ///< Color for LISSA
+        WS2812::ORANGE ///< Color for TORUS
     };
 
     uint32_t current_knot_color_ = 0;
@@ -184,6 +184,7 @@ private:
     static constexpr Hardware::AnalogInput CV_PITCH_FREE = Hardware::AnalogInput::PITCH_1; ///< CV input for free pitch modulation
     static constexpr Hardware::AnalogInput CV_PITCH_NOTE = Hardware::AnalogInput::PITCH_2; ///< CV input for quantized pitch (V/Oct)
     static constexpr Hardware::AnalogInput CV_LFO_MOD = Hardware::AnalogInput::PARAM_2;    ///< CV input for LFO MOD
+    static constexpr Hardware::DigitalInput TRIG_LFO_RESET = Hardware::DigitalInput::RESET_IN;
 
     EnumArray<Pot, std::unique_ptr<FancyPot>> pots_;
 

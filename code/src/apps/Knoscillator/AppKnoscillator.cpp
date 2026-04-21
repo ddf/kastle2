@@ -304,6 +304,7 @@ void AppKnoscillator::UiLoop()
 
     // Handle mode switching
     mode_selector_.ReadValue();
+    Mode prevMode = mode_;
     mode_ = static_cast<Mode>(mode_selector_.GetMode());
 
     // Change LED color based on mode
@@ -390,6 +391,11 @@ void AppKnoscillator::UiLoop()
     knoscil_->knotP() = knot_p;
     knoscil_->knotQ() = knot_q;
 
+    if (Kastle2::hw.GetDigitalIn(TRIG_LFO_RESET))
+    {
+        knoscil_->resetRotation();
+    }
+
      // Calculate envelope
     int32_t env_val = pots_[Pot::ENV]->GetValue();
     env_val += apply_pot_mod_attenuvert(Kastle2::hw.GetAnalogValue(CV_ENV), pots_[Pot::ENV_MOD]->GetValue());
@@ -406,7 +412,7 @@ void AppKnoscillator::UiLoop()
     Kastle2::hw.SetTriOut(((uint32_t)rot_y_value_) >> (15 - 10));
     Kastle2::hw.SetPulseOut(rot_y_value_ > Q15_HALF);
 
-    if (current_knot_color_ == 0 || pots_[Pot::MODE_MOD]->HasChanged())
+    if (current_knot_color_ == 0 || mode_ != prevMode || pots_[Pot::MODE_MOD]->HasChanged())
     {   
         // ideally we'd expand pot range to phase_t without going thru float, but my brain can't do that right now.
         float morph = static_cast<float>(pots_[Pot::MODE_MOD]->GetValue()) / POT_MAX;
