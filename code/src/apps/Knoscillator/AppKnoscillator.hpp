@@ -35,6 +35,7 @@ SOFTWARE.
 #include "common/core/Kastle2.hpp"
 #include "common/dsp/control/AdsrEnv.hpp"
 #include "common/dsp/utility/Quantizer.hpp"
+#include "common/dsp/effects/StereoDelay.hpp"
 
 #include "common/EnumTools.hpp"
 #include "common/controls/FancyMode.hpp"
@@ -137,6 +138,14 @@ private:
      */
     void Trigger();
 
+    /**
+     * @brief Update delay time based on current clock tempo
+     *
+     * Calculates delay time based on the average clock ticks and applies
+     * filtering to reduce noise in the delay time calculation.
+     */
+    void UpdateDelayTime(Fraction ratio);
+
     /** @brief Flag indicating a trigger event should be processed in the UI loop */
     bool do_trigger_ = false;
 
@@ -171,7 +180,7 @@ private:
         PITCH_SCALE, ///< Quantizer scale selection (POT_1, Mode layer)
         PITCH_ROOT,  ///< Root note selection (POT_2, Mode layer)
         PITCH_FINE,  ///< Fine pitch tuning (POT_3, Mode layer)
-        // FX,          ///< Delay effect wet/dry mix (POT_2, Shift layer)
+        FX,          ///< Delay effect wet/dry mix (POT_2, Shift layer)
         MODE_MOD,    ///< Mode attenuation control (POT_4, Mode layer)
         KNOT_P,      ///< Knot P value (POT_5, Mode layer)
         KNOT_Q,      ///< Knot Q value (POT_6, Mode layer)
@@ -230,5 +239,11 @@ private:
 
     /** @brief Flag indicating whether envelope is active (controlled by ENV pot position) */
     bool env_enabled_ = false;
+
+    /** @brief StereoDelay effect applied post-envelope */
+    StereoDelay stereo_delay_ = StereoDelay(StereoDelay::kMaxDelay / 2);
+
+    /** @brief Previous delay length value for noise filtering */
+    uint32_t prev_stereo_delay_length_ = 0;
 };
 }

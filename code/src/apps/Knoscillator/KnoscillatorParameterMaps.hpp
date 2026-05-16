@@ -106,7 +106,7 @@ static constexpr int32_t kPitchScaleDefaultValue = pot(0.6f);
 static constexpr int32_t kPitchRootDefaultValue = pot(0.0f);
 static constexpr int32_t kPitchFineDefaultValue = pot(0.5f);
 static constexpr int32_t kKnotPDefaultValue = pot(1.f/kMaxKnotPQ);
-static constexpr int32_t kKnotQDefaultValue = pot(0.f);
+static constexpr int32_t kKnotQDefaultValue = pot(0.f/kMaxKnotPQ);
 static constexpr int32_t kFxDefaultValue = pot(0.5f);
 static constexpr int32_t kResonanceDefaultValue = pot(0.0f);
 static constexpr int32_t kModeModDefaultValue = pot(0.0f);
@@ -116,9 +116,20 @@ static constexpr int32_t kEnvModDefaultValue = pot(1.0f);
 static constexpr uint32_t kModeShortPressUnder = s2alr(1.5f);
 
 // Delay
-static constexpr Fraction kDelayRatio = {3, 2};
-static constexpr auto kMapFxDelay = MapDef<int32_t, 6>{
+static constexpr Fraction kDelayRatio = {2, 1};
+static constexpr auto kMapFxDelayWet = MapDef<int32_t, 6>{
     {pot(0.0f), pot(0.25f), pot(0.4f), pot(0.6f), pot(0.75f), pot(1.0f)},
-    {q15(0.5f), q15(0.2f), q15(0.0f), q15(0.0f), q15(0.2f), q15(0.5f)}};
+    {q15(0.5f), q15(0.2f), q15(0.0f), q15(0.0f), q15(0.2f), q15(0.5f)}
+};
 
-}
+static constexpr auto kMapFxDelayFeed = MapDef<int32_t, 6>{
+    {pot(0.0f), pot(0.25f), pot(0.4f), pot(0.6f), pot(0.75f), pot(1.0f)},
+    {q15(-0.8), q15(-0.4f), q15(0.0f), q15(0.0f), q15(0.4f), q15(0.8f)}
+};
+
+static constexpr auto kMapFxDelayFilter = MapDef<int32_t, 6>{
+    {pot(0.0f), pot(0.25f), pot(0.4f), pot(0.6f), pot(0.75f), pot(1.0f)},
+    {q15(-0.5f), q15(-0.25f), q15(0.0f), q15(0.0f), q15(0.45f), q15(0.9f)}
+};
+
+} // namespace knoscillator

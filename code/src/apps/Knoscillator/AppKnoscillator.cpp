@@ -64,6 +64,12 @@ void AppKnoscillator::Init()
     env_value_ = 0;
     env_enabled_ = false;
 
+    stereo_delay_.Init(SAMPLE_RATE);
+    stereo_delay_.SetFeedback(q15(0.15f));
+    stereo_delay_.SetFilterEnabled(true);
+    stereo_delay_.SetFilterResonance(0.6f);
+    UpdateDelayTime(kDelayRatio);
+
     // Allow ENV OUT to be controlled by this App
     Kastle2::base.SetFeatureEnabled(Base::Feature::ENV_OUT, false);
     // Allow LFO to be controlled by this App
@@ -120,6 +126,14 @@ void AppKnoscillator::Init()
         .layer = Hardware::Layer::SHIFT,
         .initial_value = kEnvModDefaultValue,
         .deadzone = true
+    });
+
+    pots_[Pot::FX] = FancyPot::Create({
+        .pot = Hardware::Pot::POT_2,
+        .layer = Hardware::Layer::SHIFT,
+        .initial_value = kFxDefaultValue,
+        .deadzone = true,
+        .memory_addr = kMemFx
     });
 
     pots_[Pot::FM_RATIO] = FancyPot::Create({
@@ -240,7 +254,8 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
             rout = q15_mult(rout, env_value_);
         }
 
-        writer << lout << rout;
+        auto dout = stereo_delay_.Process(lout, rout);
+        writer << dout.left << dout.right;
 
         if (outData_read_ == outDataSize)
         {
@@ -376,6 +391,7 @@ void AppKnoscillator::UiLoop()
     rot_val += apply_pot_mod_attenuvert(Kastle2::hw.GetAnalogValue(CV_LFO_MOD), pots_[Pot::LFO_MOD]->GetValue());
     float rot_ratio = 4.f * q31_to_float(curve_map(rot_val, kMapRotRatio, MapClamp::TRUE, MapSafe::TRUE));
 
+    // removing volatile keyword here makes knot_p and knot_q get set to 0 for some reason?
     volatile int32_t knot_p_val = pots_[Pot::KNOT_P]->GetValue();
     volatile int32_t knot_q_val = pots_[Pot::KNOT_Q]->GetValue();
     volatile int32_t knot_p = curve_map(knot_p_val, kMapKnotPQ, MapClamp::TRUE, MapSafe::TRUE);
@@ -411,6 +427,16 @@ void AppKnoscillator::UiLoop()
     // Pass the captured rotation to the LFO TRI output
     Kastle2::hw.SetTriOut(((uint32_t)rot_y_value_) >> (15 - 10));
     Kastle2::hw.SetPulseOut(rot_y_value_ > Q15_HALF);
+
+    // Update delay
+    int32_t fx_value = pots_[Pot::FX]->GetValue();
+    q15_t delay_wet = curve_map(fx_value, kMapFxDelayWet, MapClamp::TRUE, MapSafe::TRUE);
+    q15_t delay_fbk = curve_map(fx_value, kMapFxDelayFeed, MapClamp::TRUE, MapSafe::TRUE);
+    q15_t delay_flt = curve_map(fx_value, kMapFxDelayFilter, MapClamp::TRUE, MapSafe::TRUE);
+    stereo_delay_.SetWet(delay_wet);
+    stereo_delay_.SetFeedback(delay_fbk);
+    stereo_delay_.SetFilterCrossfade(delay_flt);
+    UpdateDelayTime({knot_p, knot_q});
 
     if (current_knot_color_ == 0 || mode_ != prevMode || pots_[Pot::MODE_MOD]->HasChanged())
     {   
@@ -453,6 +479,18 @@ FASTCODE void knoscillator::AppKnoscillator::SecondCoreWorker()
             //Kastle2::hw.SetDebugPin(1, 0);
         }
     }
+}
+
+void AppKnoscillator::UpdateDelayTime(Fraction ratio)
+{
+    size_t stereo_delay_length = ((Kastle2::base.GetClock().GetAverageTargetTicks() * AUDIO_BUFFER_SIZE) * ratio.n) / ratio.d;
+    // Filter out noise
+    if (diff(stereo_delay_length, prev_stereo_delay_length_) < 10)
+    {
+        return;
+    }
+    prev_stereo_delay_length_ = stereo_delay_length;
+    stereo_delay_.SetDelay(std::max(int(stereo_delay_length) + 80, 5), std::max(int(stereo_delay_length) - 80, 5));
 }
 
 void AppKnoscillator::MidiCallback(midi::Message *msg)
