@@ -280,7 +280,7 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
     gDbg.ky = coord.y.v_;
     gDbg.kz = coord.z.v_;
     //gDbg.rr = knoscil_->rotator.rInc.v_;
-    gDbg.ryf = knoscil_->rotator.params.ratioY.value;
+    //gDbg.ryf = knoscil_->rotator.params.ratioY.value;
     gDbg.ryfa = vessl::cast<vessl::analog_t>(gDbg.ryf);
     gDbg.cx = vessl::cast<vessl::analog_t>(coord.x);
     gDbg.cy = vessl::cast<vessl::analog_t>(coord.y);
