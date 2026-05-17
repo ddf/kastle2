@@ -43,14 +43,18 @@ SOFTWARE.
 
 // not only do we not have the processing power to smooth P&Q,
 // trying to use that code overflows the FASTCODE section of the binary.
-using Knoscil = Knoscillator<vessl::q31, false>;
+using Knoscil = Knoscillator<vessl::q31, I2S::kAudioBufferSize, false>;
 
 struct KnotDebug 
 {
     vessl::phase_t pp, pq, pz;
     kastle2::q31_t kx, ky, kz;
-    kastle2::q31_t rx, ry, rz, proj;
-    vessl::analog_t cx, cy, cz;
+    vessl::phase_t rf, ry;
+    int32_t     rr;
+    vessl::analog_t ryf;
+    vessl::analog_t ryfa;
+    kastle2::q31_t proj;
+    vessl::phase_t cx, cy, cz;
     kastle2::q31_t left, right;
 };
 

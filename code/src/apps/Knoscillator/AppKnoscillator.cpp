@@ -279,9 +279,9 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
     gDbg.kx = coord.x.v_;
     gDbg.ky = coord.y.v_;
     gDbg.kz = coord.z.v_;
-    gDbg.rx = knoscil_->knotCoordRotated.x.v_;
-    gDbg.ry = knoscil_->knotCoordRotated.y.v_;
-    gDbg.rz = knoscil_->knotCoordRotated.z.v_;
+    //gDbg.rr = knoscil_->rotator.rInc.v_;
+    gDbg.ryf = knoscil_->rotator.params.ratioY.value;
+    gDbg.ryfa = vessl::cast<vessl::analog_t>(gDbg.ryf);
     gDbg.cx = vessl::cast<vessl::analog_t>(coord.x);
     gDbg.cy = vessl::cast<vessl::analog_t>(coord.y);
     gDbg.cz = vessl::cast<vessl::analog_t>(coord.z);
@@ -389,7 +389,7 @@ void AppKnoscillator::UiLoop()
     // Calculate rotation settings
     int32_t rot_val = pots_[Pot::LFO]->GetValue();
     rot_val += apply_pot_mod_attenuvert(Kastle2::hw.GetAnalogValue(CV_LFO_MOD), pots_[Pot::LFO_MOD]->GetValue());
-    float rot_ratio = 4.f * q31_to_float(curve_map(rot_val, kMapRotRatio, MapClamp::TRUE, MapSafe::TRUE));
+    float rot_ratio = q31_to_float(curve_map(rot_val, kMapRotRatio, MapClamp::TRUE, MapSafe::TRUE));
 
     // removing volatile keyword here makes knot_p and knot_q get set to 0 for some reason?
     volatile int32_t knot_p_val = pots_[Pot::KNOT_P]->GetValue();
