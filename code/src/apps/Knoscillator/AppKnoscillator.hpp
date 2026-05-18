@@ -29,6 +29,7 @@ SOFTWARE.
 #include <cstdint>
 
 #include "vessicle/Knoscillator.h"
+#include "vessicle/Projector.h"
 
 #include "common/core/App.hpp"
 #include "common/core/Hardware.hpp"
@@ -43,7 +44,8 @@ SOFTWARE.
 
 // not only do we not have the processing power to smooth P&Q,
 // trying to use that code overflows the FASTCODE section of the binary.
-using Knoscil = Knoscillator<vessl::q31, I2S::kAudioBufferSize, false>;
+using Knoscil = Knoscillator<vessl::q31, false>;
+using Camera  = Projector<vessl::q31>;
 
 struct KnotDebug 
 {
@@ -222,9 +224,10 @@ private:
 
     Mode mode_ = Mode::TFOIL_LISSA;
     Knoscil* knoscil_ = nullptr;
-    Knoscil::SampleType* outData;
-    vessl::size_t outData_read_;
-    vessl::size_t outData_write_;
+    Camera*  camera_ = nullptr;
+    Knoscil::SampleType* out_data_ = nullptr;
+    vessl::size_t out_data_read_ = 0;
+    vessl::size_t out_data_write_ = 0;
 
     /** @brief Pitch quantizer for musical note quantization */
     Quantizer quantizer_;

@@ -35,7 +35,7 @@ using KnotType = Knoscil::KnotType;
 
 KnotDebug gDbg;
 
-static constexpr size_t outDataSize = I2S::kAudioBufferSize*2;
+static constexpr size_t out_data_size = I2S::kAudioBufferSize*2;
 
 void AppKnoscillator::Init()
 {
@@ -43,10 +43,12 @@ void AppKnoscillator::Init()
     mode_ = Mode::TFOIL_LISSA;
     knoscil_ = Knoscil::create(SAMPLE_RATE);
     knoscil_->frequency() = 220.f;
+    
+    camera_ = Camera::create(6.0f * Knoscil::KnotOscil::KNOT_SCALE);
 
-    outData = new Knoscil::SampleType[outDataSize];
-    outData_read_ = 0;
-    outData_write_ = 0;
+    out_data_ = new Knoscil::SampleType[out_data_size];
+    out_data_read_ = 0;
+    out_data_write_ = 0;
 
     // disable audio chain, we are doing it ourselves
     Kastle2::base.SetFeatureEnabled(Base::Feature::AUDIO_CHAIN, false);
@@ -206,7 +208,8 @@ void AppKnoscillator::DeInit()
 {
     inited_ = false;
     Knoscil::destroy(knoscil_);
-    delete[] outData;
+    Camera::destroy(camera_);
+    delete[] out_data_;
 }
 
 FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *output, size_t size)
@@ -235,12 +238,14 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
     // kick off second core on next buffer while we process the last one it created
     MultiCore::SendMessage(MultiCore::MessageType::BEGIN, size);
 
-    Knoscil::SampleType samp;
+    Knoscil::SampleType knotCoord;
+    Camera::output_t samp;
     vessl::array<q15_t> out(output, size*2);
     auto writer = out.getWriter();
     while(writer.available())
     {
-        samp = outData[outData_read_++];
+        knotCoord = out_data_[out_data_read_++];
+        samp = camera_->process(knotCoord);
 
         q15_t lout = q31_to_q15(vessl::cast<q31_t>(samp.left()));
         q15_t rout = q31_to_q15(vessl::cast<q31_t>(samp.right()));
@@ -257,9 +262,9 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
         auto dout = stereo_delay_.Process(lout, rout);
         writer << dout.left << dout.right;
 
-        if (outData_read_ == outDataSize)
+        if (out_data_read_ == out_data_size)
         {
-            outData_read_ = 0;
+            out_data_read_ = 0;
         }
     }
 
@@ -275,24 +280,23 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
     gDbg.left = samp.left().v_;
     gDbg.right = samp.right().v_;
 
-    auto coord = knoscil_->knot().xyz();
-    gDbg.kx = coord.x.v_;
-    gDbg.ky = coord.y.v_;
-    gDbg.kz = coord.z.v_;
+    gDbg.kx = knotCoord.left().v_;
+    gDbg.ky = knotCoord.center().v_;
+    gDbg.kz = knotCoord.right().v_;
     //gDbg.rr = knoscil_->rotator.rInc.v_;
     //gDbg.ryf = knoscil_->rotator.params.ratioY.value;
     gDbg.ryfa = vessl::cast<vessl::analog_t>(gDbg.ryf);
-    gDbg.cx = vessl::cast<vessl::analog_t>(coord.x);
-    gDbg.cy = vessl::cast<vessl::analog_t>(coord.y);
-    gDbg.cz = vessl::cast<vessl::analog_t>(coord.z);
-    gDbg.proj = knoscil_->getProjection().v_;
+    gDbg.cx = vessl::cast<vessl::analog_t>(knotCoord.left());
+    gDbg.cy = vessl::cast<vessl::analog_t>(knotCoord.center());
+    gDbg.cz = vessl::cast<vessl::analog_t>(knotCoord.right());
+    gDbg.proj = 0; // knoscil_->getProjection().v_;
 }
 
 void knoscillator::AppKnoscillator::SecondCoreGenerate(size_t size)
 {
-    vessl::array<Knoscil::SampleType> buf(outData + outData_write_, size);
+    vessl::array<Knoscil::SampleType> buf(out_data_ + out_data_write_, size);
     knoscil_->generate(buf);
-    outData_write_ = (outData_write_ + size) % outDataSize;
+    out_data_write_ = (out_data_write_ + size) % out_data_size;
 }
 
 void AppKnoscillator::Trigger()
