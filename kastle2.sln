@@ -16,6 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7430E0E3-5CF
 	ProjectSection(SolutionItems) = preProject
 		code\src\tusb_config.h = code\src\tusb_config.h
 		code\src\usb_descriptors.c = code\src\usb_descriptors.c
+		code\src\vessl_kqmath.hpp = code\src\vessl_kqmath.hpp
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{FCC6F35B-0B50-4C19-87D1-8B3A2486FCA5}"

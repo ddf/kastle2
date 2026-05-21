@@ -241,7 +241,7 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
     Knoscil::SampleType knotCoord;
     Camera::output_t samp;
     vessl::array<q15_t> out(output, size*2);
-    auto writer = out.getWriter();
+    auto writer = out.make_writer();
     while(writer.available())
     {
         knotCoord = out_data_[out_data_read_++];
