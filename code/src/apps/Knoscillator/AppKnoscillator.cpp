@@ -44,7 +44,7 @@ void AppKnoscillator::Init()
     knoscil_ = Knoscil::create(SAMPLE_RATE);
     knoscil_->frequency() = 220.f;
     
-    camera_ = Camera::create(6.0f * Knoscil::KnotOscil::KNOT_SCALE);
+    camera_ = Camera::create(4.0f * Knoscil::KnotOscil::KNOT_SCALE);
 
     out_data_ = new Knoscil::SampleType[out_data_size];
     out_data_read_ = 0;
@@ -68,6 +68,7 @@ void AppKnoscillator::Init()
 
     stereo_delay_.Init(SAMPLE_RATE);
     stereo_delay_.SetFeedback(q15(0.15f));
+    stereo_delay_.SetWet(Q15_MAX);
     stereo_delay_.SetFilterEnabled(true);
     stereo_delay_.SetFilterResonance(0.6f);
     UpdateDelayTime(kDelayRatio);
@@ -260,7 +261,9 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
         }
 
         auto dout = stereo_delay_.Process(lout, rout);
-        writer << dout.left << dout.right;
+        lout = q15_add(lout, q15_mult(dout.left, delay_wet_));
+        rout = q15_add(rout, q15_mult(dout.right, delay_wet_));
+        writer << lout << rout;
 
         if (out_data_read_ == out_data_size)
         {
@@ -434,13 +437,13 @@ void AppKnoscillator::UiLoop()
 
     // Update delay
     int32_t fx_value = pots_[Pot::FX]->GetValue();
-    q15_t delay_wet = curve_map(fx_value, kMapFxDelayWet, MapClamp::TRUE, MapSafe::TRUE);
     q15_t delay_fbk = curve_map(fx_value, kMapFxDelayFeed, MapClamp::TRUE, MapSafe::TRUE);
     q15_t delay_flt = curve_map(fx_value, kMapFxDelayFilter, MapClamp::TRUE, MapSafe::TRUE);
-    stereo_delay_.SetWet(delay_wet);
     stereo_delay_.SetFeedback(delay_fbk);
     stereo_delay_.SetFilterCrossfade(delay_flt);
     UpdateDelayTime({knot_p, knot_q});
+    
+    delay_wet_ = curve_map(fx_value, kMapFxDelayWet, MapClamp::TRUE, MapSafe::TRUE);
 
     if (current_knot_color_ == 0 || mode_ != prevMode || pots_[Pot::MODE_MOD]->HasChanged())
     {   

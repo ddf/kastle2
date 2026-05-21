@@ -250,6 +250,8 @@ private:
     /** @brief StereoDelay effect applied post-envelope */
     StereoDelay stereo_delay_ = StereoDelay(StereoDelay::kMaxDelay / 2);
 
+    q15_t delay_wet_ = Q15_ZERO;
+
     /** @brief Previous delay length value for noise filtering */
     uint32_t prev_stereo_delay_length_ = 0;
 };
