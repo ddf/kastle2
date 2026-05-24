@@ -10,13 +10,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wiki", "wiki", "{AB0327BE-5
 		MIDI_MAPPINGS.md = MIDI_MAPPINGS.md
 		README.md = README.md
 		TOOLCHAIN_INSTALL.md = TOOLCHAIN_INSTALL.md
+		KNOSCILLATOR.md = KNOSCILLATOR.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{7430E0E3-5CF6-4AAD-8BD9-D7FD4A6ED725}"
 	ProjectSection(SolutionItems) = preProject
 		code\src\tusb_config.h = code\src\tusb_config.h
 		code\src\usb_descriptors.c = code\src\usb_descriptors.c
-		code\src\vessl_kqmath.hpp = code\src\vessl_kqmath.hpp
+		code\src\quartz_kastle.h = code\src\quartz_kastle.h
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{FCC6F35B-0B50-4C19-87D1-8B3A2486FCA5}"
