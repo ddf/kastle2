@@ -28,6 +28,7 @@ SOFTWARE.
 #include <cstddef>
 #include <cstdint>
 
+#include "quartz_kastle.h"
 #include "vessicle/Knoscillator.h"
 #include "vessicle/Projector.h"
 
@@ -42,6 +43,10 @@ SOFTWARE.
 #include "common/controls/FancyMode.hpp"
 #include "common/controls/FancyPot.hpp"
 
+namespace quartz_kastle
+{
+
+using namespace kastle2;
 // not only do we not have the processing power to smooth P&Q,
 // trying to use that code overflows the FASTCODE section of the binary.
 using Knoscil = Knoscillator<vessl::q31, false>;
@@ -62,12 +67,7 @@ struct KnotDebug
 
 extern KnotDebug gDbg;
 
-using namespace kastle2;
-
-namespace knoscillator
-{
-
-class AppKnoscillator : public virtual App
+class AppKnoscillator : public App
 {
 public:
     /**
@@ -126,7 +126,7 @@ public:
      */
     uint8_t GetId() override
     {
-        return Kastle2::kDefaultAppId;
+      return app_id::kKnoscillator;
     }
 
 private:
@@ -160,7 +160,7 @@ private:
 
     bool inited_ = false;
 
-        /** @brief LED colors for each knot type */
+    /** @brief LED colors for each knot type */
     EnumArray<Knoscil::KnotType, uint32_t> knot_colors_ = {
         WS2812::TEAL, ///< Color for TFOIL
         WS2812::LIME, ///< Color for LISSA
@@ -255,4 +255,4 @@ private:
     /** @brief Previous delay length value for noise filtering */
     uint32_t prev_stereo_delay_length_ = 0;
 };
-}
+} // quartz_kastle

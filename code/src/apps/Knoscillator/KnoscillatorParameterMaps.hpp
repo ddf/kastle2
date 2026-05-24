@@ -29,7 +29,7 @@ SOFTWARE.
 #include "common/dsp/math/math_utils.hpp"
 
 // based on ExampleSynthParameterMaps
-namespace knoscillator
+namespace quartz_kastle
 {
 
 // Base tuning frequency in Hz

@@ -29,7 +29,6 @@ SOFTWARE.
 #include "common/core/Kastle2.hpp"
 
 using namespace kastle2;
-using namespace knoscillator;
 
 /**
  * @file main.cpp
@@ -38,7 +37,7 @@ using namespace knoscillator;
  * @date 2023-11-28
  */
 
-AppKnoscillator app;
+quartz_kastle::AppKnoscillator app;
 
 static void process_audio(q15_t *input, q15_t *output, size_t size)
 {

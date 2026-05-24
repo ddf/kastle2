@@ -26,11 +26,10 @@ SOFTWARE.
 #include "AppKnoscillator.hpp"
 #include "common/core/Kastle2.hpp"
 #include "common/utils.hpp"
-#include "vessl_kqmath.hpp"
 #include "KnoscillatorParameterMaps.hpp"
 
-using namespace kastle2;
-using namespace knoscillator;
+namespace quartz_kastle
+{
 using KnotType = Knoscil::KnotType;
 
 KnotDebug gDbg;
@@ -277,25 +276,25 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
         pot->Process();
     }
 
-    gDbg.pp = knoscil_->knot().pp();
-    gDbg.pq = knoscil_->knot().pq();
-    gDbg.pz = knoscil_->knot().pz();
-    gDbg.left = samp.left().v_;
-    gDbg.right = samp.right().v_;
+    // gDbg.pp = knoscil_->knot().pp();
+    // gDbg.pq = knoscil_->knot().pq();
+    // gDbg.pz = knoscil_->knot().pz();
+    // gDbg.left = samp.left().v_;
+    // gDbg.right = samp.right().v_;
 
-    gDbg.kx = knotCoord.left().v_;
-    gDbg.ky = knotCoord.center().v_;
-    gDbg.kz = knotCoord.right().v_;
-    //gDbg.rr = knoscil_->rotator.rInc.v_;
-    //gDbg.ryf = knoscil_->rotator.params.ratioY.value;
-    gDbg.ryfa = vessl::cast<vessl::analog_t>(gDbg.ryf);
-    gDbg.cx = vessl::cast<vessl::analog_t>(knotCoord.left());
-    gDbg.cy = vessl::cast<vessl::analog_t>(knotCoord.center());
-    gDbg.cz = vessl::cast<vessl::analog_t>(knotCoord.right());
-    gDbg.proj = 0; // knoscil_->getProjection().v_;
+    // gDbg.kx = knotCoord.left().v_;
+    // gDbg.ky = knotCoord.center().v_;
+    // gDbg.kz = knotCoord.right().v_;
+    // //gDbg.rr = knoscil_->rotator.rInc.v_;
+    // //gDbg.ryf = knoscil_->rotator.params.ratioY.value;
+    // gDbg.ryfa = vessl::cast<vessl::analog_t>(gDbg.ryf);
+    // gDbg.cx = vessl::cast<vessl::analog_t>(knotCoord.left());
+    // gDbg.cy = vessl::cast<vessl::analog_t>(knotCoord.center());
+    // gDbg.cz = vessl::cast<vessl::analog_t>(knotCoord.right());
+    // gDbg.proj = 0; // knoscil_->getProjection().v_;
 }
 
-void knoscillator::AppKnoscillator::SecondCoreGenerate(size_t size)
+void AppKnoscillator::SecondCoreGenerate(size_t size)
 {
     vessl::array<Knoscil::SampleType> buf(out_data_ + out_data_write_, size);
     knoscil_->generate(buf);
@@ -462,7 +461,7 @@ void AppKnoscillator::UiLoop()
     Kastle2::hw.SetLed(Hardware::Led::LED_2, color);
 }
 
-FASTCODE void knoscillator::AppKnoscillator::SecondCoreWorker()
+FASTCODE void AppKnoscillator::SecondCoreWorker()
 {
     while (inited_)
     {
@@ -506,7 +505,7 @@ void AppKnoscillator::MidiCallback(midi::Message *msg)
     (void)msg;
 }
 
-void knoscillator::AppKnoscillator::MemoryInitialization()
+void AppKnoscillator::MemoryInitialization()
 {
     Kastle2::memory.Write8(kMemMode, std::to_underlying(Mode::TFOIL_LISSA));
     Kastle2::memory.Write8(kMemFx, pot_to_mem(kFxDefaultValue));
@@ -518,3 +517,4 @@ void knoscillator::AppKnoscillator::MemoryInitialization()
     Kastle2::memory.Write8(kMemModeKnotP, pot_to_mem(kKnotPDefaultValue));
     Kastle2::memory.Write8(kMemModeKnotQ, pot_to_mem(kKnotQDefaultValue));
 }
+} // namespace quartz_kastle
