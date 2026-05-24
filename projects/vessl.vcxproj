@@ -27,10 +27,19 @@
   <ItemGroup>
     <ClInclude Include="..\code\src\vessicle\vessl\vessl.h" />
     <ClInclude Include="..\code\src\vessicle\vessl\vessl_arm_math.inl" />
-    <ClInclude Include="..\code\src\vessicle\vessl\vessl_frame.inl" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl_core.inl" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl_filtering.inl" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl_generators.inl" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl_math.inl" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl_noise.inl" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl_parameter.inl" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl_processors.inl" />
     <ClInclude Include="..\code\src\vessicle\vessl\vessl_qmath.h" />
     <ClInclude Include="..\code\src\vessicle\vessl\vessl_qmath.inl" />
     <ClInclude Include="..\code\src\vessicle\vessl\vessl_qmath_lut.h" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl_sample.inl" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl_time.inl" />
+    <ClInclude Include="..\code\src\vessicle\vessl\vessl_units.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
