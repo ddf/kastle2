@@ -81,6 +81,12 @@ public:
         COUNT
     };
 
+    enum class InputRoute
+    {
+      PRE_FX,
+      POST_FX
+    };
+
     /**
      * @brief Initializes all the parameters, memory, etc.
      */
@@ -157,6 +163,7 @@ private:
 
     /** @brief Edge detector for trigger input processing (rising edge) */
     EdgeDetector trigger_ = EdgeDetector(EdgeDetector::Type::RISING);
+    uint32_t shift_press_millis_ = 0;
 
     bool inited_ = false;
 
@@ -190,6 +197,7 @@ private:
         MODE_MOD,    ///< Mode attenuation control (POT_4, Mode layer)
         KNOT_P,      ///< Knot P value (POT_5, Mode layer)
         KNOT_Q,      ///< Knot Q value (POT_6, Mode layer)
+        INPUT_ROUTE, ///< before FX or after (POT_5, SETTINGS layer)
         COUNT        ///< Total number of potentiometer controls
     };
 
@@ -221,6 +229,7 @@ private:
     static constexpr size_t kMemModeMod = Memory::ADDR_APP_SPACE + 0x6;    ///< Memory address for mode modulation setting
     static constexpr size_t kMemModeKnotP = Memory::ADDR_APP_SPACE + 0x7;  ///< Memory address for Knot P setting
     static constexpr size_t kMemModeKnotQ = Memory::ADDR_APP_SPACE + 0x8;  ///< Memory address for Knot Q setting
+    static constexpr size_t kMemInputRoute = Memory::ADDR_APP_SPACE + 0x9; ///< Memory address for INput Route setting
 
     Mode mode_ = Mode::TFOIL_LISSA;
     Knoscil* knoscil_ = nullptr;
@@ -254,5 +263,7 @@ private:
 
     /** @brief Previous delay length value for noise filtering */
     uint32_t prev_stereo_delay_length_ = 0;
+
+    InputRoute input_route_ = InputRoute::POST_FX;
 };
 } // quartz_kastle

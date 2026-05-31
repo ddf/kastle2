@@ -191,6 +191,14 @@ void AppKnoscillator::Init()
         .memory_addr = kMemModeKnotQ
     });
 
+    // Settings layer
+    pots_[Pot::INPUT_ROUTE] = FancyPot::Create({
+      .pot = Hardware::Pot::POT_5,
+      .layer = Hardware::Layer::SETTINGS,
+      .initial_value = POT_MAX,
+      .memory_addr = kMemInputRoute
+    });
+
     // Pots need to be initialized
     for (auto &pot : pots_)
     {
@@ -212,7 +220,7 @@ void AppKnoscillator::DeInit()
     delete[] out_data_;
 }
 
-FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *output, size_t size)
+FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t size)
 {
     if (!inited_)
     {
@@ -240,7 +248,9 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
 
     Knoscil::SampleType knotCoord;
     Camera::output_t samp;
+    vessl::array<q15_t> in(input, size*2);
     vessl::array<q15_t> out(output, size*2);
+    auto reader = in.make_reader();
     auto writer = out.make_writer();
     while(writer.available())
     {
@@ -259,9 +269,23 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
             rout = q15_mult(rout, env_value_);
         }
 
+        if (input_route_ == InputRoute::PRE_FX)
+        {
+          lout = q15_add(lout, reader.read());
+          rout = q15_add(rout, reader.read());
+        }
+
+
         auto dout = stereo_delay_.Process(lout, rout);
         lout = q15_add(lout, q15_mult(dout.left, delay_wet_));
         rout = q15_add(rout, q15_mult(dout.right, delay_wet_));
+
+        if (input_route_ == InputRoute::POST_FX)
+        {
+          lout = q15_add(lout, reader.read());
+          rout = q15_add(rout, reader.read());
+        }
+
         writer << lout << rout;
 
         if (out_data_read_ == out_data_size)
@@ -317,6 +341,16 @@ void AppKnoscillator::Trigger()
 
 void AppKnoscillator::UiLoop()
 {
+    if (Kastle2::hw.JustReleased(Hardware::Button::SHIFT))
+    {
+      do_trigger_ |= (shift_press_millis_ < 250);
+      shift_press_millis_ = 0;
+    }
+    else
+    {
+      shift_press_millis_ = Kastle2::hw.PressedMillis(Hardware::Button::SHIFT);
+    }
+
     if (do_trigger_)
     {
         Trigger();
@@ -455,10 +489,43 @@ void AppKnoscillator::UiLoop()
         current_knot_color_ = WS2812::CrossfadeColors(colorA, colorB, morph*255 + 0.5f);
     }
 
-    uint8_t bright = (env_value_ >> (15 - 6)) + 63;
-    uint32_t color = WS2812::ApplyBrightness(current_knot_color_, bright);
-    Kastle2::hw.SetLed(Hardware::Led::LED_1, color);
-    Kastle2::hw.SetLed(Hardware::Led::LED_2, color);
+    if (pots_[Pot::INPUT_ROUTE]->GetValue() < POT_HALF)
+    {
+      input_route_ = InputRoute::PRE_FX;
+    }
+    else
+    {
+      input_route_ = InputRoute::POST_FX;
+    }
+
+    if (Kastle2::hw.GetLayer() == Hardware::Layer::SETTINGS)
+    {
+      switch(input_route_)
+      {
+        case InputRoute::PRE_FX:
+        {
+          Kastle2::hw.SetLed(Hardware::Led::LED_1, WS2812::GREEN);
+          Kastle2::hw.SetLed(Hardware::Led::LED_2, WS2812::BLACK);
+        }
+        break;
+
+        case InputRoute::POST_FX:
+        {
+          Kastle2::hw.SetLed(Hardware::Led::LED_1, WS2812::BLACK);
+          Kastle2::hw.SetLed(Hardware::Led::LED_2, WS2812::GREEN);
+        }
+        break;
+      }
+
+      Kastle2::hw.SetLed(Hardware::Led::LED_3, WS2812::ORANGE);
+    }
+    else
+    {
+      uint8_t bright = (env_value_ >> (15 - 6)) + 63;
+      uint32_t color = WS2812::ApplyBrightness(current_knot_color_, bright);
+      Kastle2::hw.SetLed(Hardware::Led::LED_1, color);
+      Kastle2::hw.SetLed(Hardware::Led::LED_2, color);
+    }
 }
 
 FASTCODE void AppKnoscillator::SecondCoreWorker()
@@ -516,5 +583,6 @@ void AppKnoscillator::MemoryInitialization()
     Kastle2::memory.Write8(kMemModeMod, pot_to_mem(kModeModDefaultValue));
     Kastle2::memory.Write8(kMemModeKnotP, pot_to_mem(kKnotPDefaultValue));
     Kastle2::memory.Write8(kMemModeKnotQ, pot_to_mem(kKnotQDefaultValue));
+    Kastle2::memory.Write8(kMemInputRoute, pot_to_mem(POT_MIN));
 }
 } // namespace quartz_kastle
