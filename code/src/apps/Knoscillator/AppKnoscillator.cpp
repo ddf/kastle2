@@ -325,6 +325,16 @@ void AppKnoscillator::Trigger()
 
 void AppKnoscillator::UiLoop()
 {
+    if (Kastle2::hw.JustReleased(Hardware::Button::SHIFT))
+    {
+      do_trigger_ |= (shift_press_millis_ < 250);
+      shift_press_millis_ = 0;
+    }
+    else
+    {
+      shift_press_millis_ = Kastle2::hw.PressedMillis(Hardware::Button::SHIFT);
+    }
+
     if (do_trigger_)
     {
         Trigger();

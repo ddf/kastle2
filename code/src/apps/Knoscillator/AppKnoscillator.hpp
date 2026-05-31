@@ -157,6 +157,7 @@ private:
 
     /** @brief Edge detector for trigger input processing (rising edge) */
     EdgeDetector trigger_ = EdgeDetector(EdgeDetector::Type::RISING);
+    uint32_t shift_press_millis_ = 0;
 
     bool inited_ = false;
 
