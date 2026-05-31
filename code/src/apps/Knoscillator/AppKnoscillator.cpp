@@ -212,7 +212,7 @@ void AppKnoscillator::DeInit()
     delete[] out_data_;
 }
 
-FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *output, size_t size)
+FASTCODE void AppKnoscillator::AudioLoop(q15_t *input, q15_t *output, size_t size)
 {
     if (!inited_)
     {
@@ -240,7 +240,9 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
 
     Knoscil::SampleType knotCoord;
     Camera::output_t samp;
+    vessl::array<q15_t> in(input, size*2);
     vessl::array<q15_t> out(output, size*2);
+    auto reader = in.make_reader();
     auto writer = out.make_writer();
     while(writer.available())
     {
@@ -259,9 +261,15 @@ FASTCODE void AppKnoscillator::AudioLoop([[maybe_unused]]q15_t *input, q15_t *ou
             rout = q15_mult(rout, env_value_);
         }
 
+
         auto dout = stereo_delay_.Process(lout, rout);
         lout = q15_add(lout, q15_mult(dout.left, delay_wet_));
         rout = q15_add(rout, q15_mult(dout.right, delay_wet_));
+
+        // add input audio
+        lout = q15_add(lout, reader.read());
+        rout = q15_add(rout, reader.read());
+
         writer << lout << rout;
 
         if (out_data_read_ == out_data_size)
